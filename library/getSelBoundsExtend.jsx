@@ -108,37 +108,38 @@ function getBoundsExtend (item) {
      * @return{Array} result - the biggest bounds
      * */
     function _compareBounds (item, boundsToCompare) {
-       var elemBounds = elem.geometricBounds;
+      var elemBounds = item.geometricBounds;
 
-           return [
-                Math.min(elemBounds[0], boundsToCompare[0]), 
-                Math.max(elemBounds[1],boundsToCompare[1]), 
-                Math.max(elemBounds[2],boundsToCompare[2]), 
-                Math.min(elemBounds[3],boundsToCompare[3])
-        ]
-  }
+      return [
+        Math.min (elemBounds[0], boundsToCompare[0]),
+        Math.max (elemBounds[1], boundsToCompare[1]),
+        Math.max (elemBounds[2], boundsToCompare[2]),
+        Math.min (elemBounds[3], boundsToCompare[3])
+      ]
+    }
 
 // calculate item width by it left and right bounds
-  function _calcElemWidthByBounds (bounds) {
-    var elemWidth = 0,
-        left      = bounds[0],
-        right     = bounds[2];
+    function _calcElemWidthByBounds (bounds) {
+      var elemWidth = 0,
+          left      = bounds[0],
+          right     = bounds[2];
 
-    (left <= 0 && right <= 0) || (left >= 0 && right >= 0) ? elemWidth = Math.abs (left - right) : '';
-    left <= 0 && right >= 0 ? elemWidth = Math.abs (left) + right : '';
+      (left <= 0 && right <= 0) || (left >= 0 && right >= 0) ? elemWidth = Math.abs (left - right) : '';
+      left <= 0 && right >= 0 ? elemWidth = Math.abs (left) + right : '';
 
-    return elemWidth;
-  }
+      return elemWidth;
+    }
 
 // calculate item height by it top and bottom bounds
-  function _calcElemHeightByBounds (bounds) {
-    var elemHeight = 0,
-        top        = bounds[1],
-        bottom     = bounds[3];
+    function _calcElemHeightByBounds (bounds) {
+      var elemHeight = 0,
+          top        = bounds[1],
+          bottom     = bounds[3];
 
-    (top <= 0 && bottom <= 0) || (top >= 0 && bottom >= 0) ? elemHeight = Math.abs (top - bottom) : '';
-    top >= 0 && bottom <= 0 ? elemHeight = top + Math.abs (bottom) : '';
-    return elemHeight;
+      (top <= 0 && bottom <= 0) || (top >= 0 && bottom >= 0) ? elemHeight = Math.abs (top - bottom) : '';
+      top >= 0 && bottom <= 0 ? elemHeight = top + Math.abs (bottom) : '';
+      return elemHeight;
+    }
+
   }
-
 }

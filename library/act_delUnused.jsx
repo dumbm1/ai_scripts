@@ -3,7 +3,7 @@
  */
 
 (function act_delAllUnused () {
-  activeDocument.swatchGroups[1].remove ();
+  delNoSpotSwatches ();
 
   {
     var str = '/version 3' +
@@ -188,18 +188,34 @@
   }
   runAction ('delAllUnused', 'delAllUnused', str);
 
+  /**
+   * todo: add ungroup swatchGroups
+   * Delete all swatches except Swatche.color.colorType == ColorModel.SPOT
+   * Delete all SwatchGroups except base
+   * */
+  function delNoSpotSwatches () {
+    var doc = activeDocument;
+    for (var i = doc.swatches.length - 1; i >= 0; i--) {
+      var sw = doc.swatches[i];
+      if (sw.color.typename == 'SpotColor') {
+        if (sw.color.spot.colorType == ColorModel.SPOT) continue;
+      }
+      sw.remove ();
+    }
+    for (var j = doc.swatchGroups.length - 1; j > 0; j--) {
+      var swGr = doc.swatchGroups[j];
+      swGr.remove ();
+    }
+  }
+
   function runAction (actName, setName, actStr) {
-    _makeAct (actStr);
+    var f = new File ('~/ScriptAction.aia');
+    f.open ('w');
+    f.write (actStr);
+    f.close ();
+    app.loadAction (f);
+    f.remove ();
     app.doScript (actName, setName, false); // action name, set name
     app.unloadAction (setName, ""); // set name
-
-    function _makeAct (actStr) {
-      var f = new File ('~/ScriptAction.aia');
-      f.open ('w');
-      f.write (actStr);
-      f.close ();
-      app.loadAction (f);
-      f.remove ();
-    }
   }
 } ());

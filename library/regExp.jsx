@@ -3,6 +3,7 @@
  */
 
 // match one string comments
-/^\s*[/]{2}.*$/
-
+var reg_oneStrComment = /^\s*[/]{2}.*$/;
+// file extension
+var reg_ext           = /\.[^\.]+$/;
 
