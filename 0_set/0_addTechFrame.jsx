@@ -1,5 +1,9 @@
 /**
- * ai.jsx ©MaratShagiev m_js@bk.ru 30.03.2016 14:17
+ * ai.jsx (c)MaratShagiev m_js@bk.ru 30.03.2016 14:17
+ *
+ * addTechFrame_v0.0.1
+ *
+ * Inserts a table with technical information into the design layout, which is sent to the client for approval.
  */
 
 (function addTechFrame () {
