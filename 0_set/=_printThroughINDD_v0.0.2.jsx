@@ -3,6 +3,8 @@
  *
  * printThroughINDD_v0.0.2
  *
+ * conditions: ai-file save as pdf-compatible
+ * action:
  * place the active document in the InDesign
  * print chosen separations to ps-file
  */
