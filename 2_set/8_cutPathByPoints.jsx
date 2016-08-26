@@ -7,31 +7,49 @@
 //@target illustrator-19
 ////@target illustrator-20
 
-cutPathByPoints_v2 (selection[0]);
+cutByCornPnts (selection[0]);
 
-function cutPathByPoints_v2 (soursePth) {
-  var i, j, currPnt, firstPnt, firstPntIndex, pntIndex, pnts = [];
+function cutByCornPnts (pth) {
+  var d = activeDocument;
 
-  executeMenuCommand ('deselectall');
+  for (var i = 0; i < pth.pathPoints.length; i++) {
+    var pnt = pth.pathPoints[i];
+    if (pnt.pointType != PointType.CORNER) continue;
 
-  for (i = 0; i < soursePth.pathPoints.length; i++) {
-    currPnt = soursePth.pathPoints[i];
-    if (currPnt.pointType != PointType.CORNER) continue;
-    firstPnt      = currPnt;
-    firstPntIndex = i;
-    break;
+    var sbPth               = d.pathItems.add ();
+    var sbPthPnt            = sbPth.pathPoints.add ();
+    sbPthPnt.anchor         = [pnt.anchor[0], pnt.anchor[1]];
+    sbPthPnt.leftDirection  = [pnt.leftDirection[0], pnt.leftDirection[1]];
+    sbPthPnt.rightDirection = [pnt.rightDirection[0], pnt.rightDirection[1]];
+    sbPthPnt.pointType      = pnt.pointType;
+
+    for (var j = i + 1; j < pth.pathPoints.length; j++) {
+      var currPnt = pth.pathPoints[j];
+      if (pnt.pointType != PointType.CORNER) {
+        var currSbPthPnt            = sbPth.pathPoints.add ();
+        currSbPthPnt.anchor         = [currPnt.anchor[0], currPnt.anchor[1]];
+        currSbPthPnt.leftDirection  = [currPnt.leftDirection[0], currPnt.leftDirection[1]];
+        currSbPthPnt.rightDirection = [currPnt.rightDirection[0], currPnt.rightDirection[1]];
+        currSbPthPnt.pointType      = currPnt.pointType;
+      } else {
+        var currSbPthPnt            = sbPth.pathPoints.add ();
+        currSbPthPnt.anchor         = [currPnt.anchor[0], currPnt.anchor[1]];
+        currSbPthPnt.leftDirection  = [currPnt.leftDirection[0], currPnt.leftDirection[1]];
+        currSbPthPnt.rightDirection = [currPnt.rightDirection[0], currPnt.rightDirection[1]];
+        currSbPthPnt.pointType      = currPnt.pointType;
+      }
+    }
+
+    for (j = 0; j < i; j++) {
+
+    }
   }
 
-  $.writeln (firstPntIndex);
-
-  for (j = 0; j < soursePth.pathPoints.length; j++) {
-
-  }
-  // soursePth.remove ();
 }
 
 /***************************
- * *************************/
+ ******* ARCHIVE ***********
+ **************************/
 
 
 function cutPathByPoints (soursePth) {
