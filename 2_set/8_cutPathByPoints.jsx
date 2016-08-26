@@ -1,137 +1,72 @@
 /**
  * ai.jsx (c)MaratShagiev m_js@bk.ru 24.08.2016
  *
- * cutPathByPoints
+ * cutByCornPnts
  */
 
-//@target illustrator-19
-////@target illustrator-20
+//@target illustrator-20
 
 cutByCornPnts (selection[0]);
 
 function cutByCornPnts (pth) {
-  var d = activeDocument;
-
-  for (var i = 0; i < pth.pathPoints.length; i++) {
-    var pnt = pth.pathPoints[i];
-    if (pnt.pointType != PointType.CORNER) continue;
-
-    var sbPth               = d.pathItems.add ();
-    var sbPthPnt            = sbPth.pathPoints.add ();
-    sbPthPnt.anchor         = [pnt.anchor[0], pnt.anchor[1]];
-    sbPthPnt.leftDirection  = [pnt.leftDirection[0], pnt.leftDirection[1]];
-    sbPthPnt.rightDirection = [pnt.rightDirection[0], pnt.rightDirection[1]];
-    sbPthPnt.pointType      = pnt.pointType;
-
-    for (var j = i + 1; j < pth.pathPoints.length; j++) {
-      var currPnt = pth.pathPoints[j];
-      if (pnt.pointType != PointType.CORNER) {
-        var currSbPthPnt            = sbPth.pathPoints.add ();
-        currSbPthPnt.anchor         = [currPnt.anchor[0], currPnt.anchor[1]];
-        currSbPthPnt.leftDirection  = [currPnt.leftDirection[0], currPnt.leftDirection[1]];
-        currSbPthPnt.rightDirection = [currPnt.rightDirection[0], currPnt.rightDirection[1]];
-        currSbPthPnt.pointType      = currPnt.pointType;
-      } else {
-        var currSbPthPnt            = sbPth.pathPoints.add ();
-        currSbPthPnt.anchor         = [currPnt.anchor[0], currPnt.anchor[1]];
-        currSbPthPnt.leftDirection  = [currPnt.leftDirection[0], currPnt.leftDirection[1]];
-        currSbPthPnt.rightDirection = [currPnt.rightDirection[0], currPnt.rightDirection[1]];
-        currSbPthPnt.pointType      = currPnt.pointType;
-      }
-    }
-
-    for (j = 0; j < i; j++) {
-
-    }
-  }
-
-}
-
-/***************************
- ******* ARCHIVE ***********
- **************************/
-
-
-function cutPathByPoints (soursePth) {
-  var i, j, sursePnt, nextSursePnt, targPnt, nextTargPnt, targPth,
-      d = activeDocument;
-
-  executeMenuCommand ('deselectall');
-
-  for (i = 0; i < soursePth.pathPoints.length; i++) {
-    try {
-      sursePnt     = soursePth.pathPoints[i];
-      nextSursePnt = soursePth.pathPoints[i + 1];
-    } catch (e) {
-      nextSursePnt = soursePth.pathPoints[0];
-    }
-
-    targPth = d.pathItems.add ();
-    targPth.setEntirePath ([
-      [sursePnt.anchor[0], sursePnt.anchor[1]],
-      [nextSursePnt.anchor[0], nextSursePnt.anchor[1]]
-    ]);
-    targPth.pathPoints[0].leftDirection  = [sursePnt.leftDirection[0], sursePnt.leftDirection[1]];
-    targPth.pathPoints[0].rightDirection = [sursePnt.rightDirection[0], sursePnt.rightDirection[1]];
-    targPth.pathPoints[0].pointType      = sursePnt.pointType;
-    targPth.pathPoints[1].leftDirection  = [nextSursePnt.leftDirection[0], nextSursePnt.leftDirection[1]];
-    targPth.pathPoints[1].rightDirection = [nextSursePnt.rightDirection[0], nextSursePnt.rightDirection[1]];
-    targPth.pathPoints[1].pointType      = nextSursePnt.pointType;
-
-    if (sursePnt.pointType == PointType.CORNER && nextSursePnt.pointType == PointType.CORNER) {
-
-    }
-  }
-  soursePth.remove ();
-}
-
-function _setPointProps (sursePnt, pnt) {
-  pnt.anchor         = [sursePnt.anchor[0], sursePnt.anchor[1]];
-  pnt.leftDirection  = [sursePnt.leftDirection[0], sursePnt.leftDirection[1]];
-  pnt.rightDirection = [sursePnt.rightDirection[0], sursePnt.rightDirection[1]];
-  pnt.pointType      = sursePnt.pointType;
-  return pnt;
-}
-
-function _cut (pnt) {
-  var dPnt_1 = __duplPathPoint (pnt);
-  var dPnt_2 = __duplPathPoint (dPnt_1);
-  executeMenuCommand ('deselectall');
-  dPnt_2.selected = PathPointSelection.ANCHORPOINT;
-  executeMenuCommand ('clear');
-
-  function __duplPathPoint (pnt) {
-    var pth             = pnt.parent; // same way is get selection[0]
-    var dPnt            = pth.pathPoints.add ();
-    dPnt.anchor         = [pnt.anchor[0], pnt.anchor[1]];
-    dPnt.leftDirection  = [pnt.leftDirection[0], pnt.leftDirection[1]];
-    dPnt.rightDirection = [pnt.rightDirection[0], pnt.rightDirection[1]];
-    dPnt.pointType      = pnt.pointType;
-    return dPnt;
-  }
-}
-
-function cutCornerShapeByPoints (pth) {
-  var i, j, pnt, nextPnt, smthPnts = [], cornPnts = [], pthCut;
-  executeMenuCommand ('deselectall');
-
-  for (i = 0; i < pth.pathPoints.length; i++) {
-    try {
-      pnt     = pth.pathPoints[i];
-      nextPnt = pth.pathPoints[i + 1];
-    } catch (e) {
-      nextPnt = pth.pathPoints[0];
-    }
-    pnt.selected = PathPointSelection.ANCHORPOINT;
-    if (pnt.pointType == PointType.CORNER && nextPnt.pointType == PointType.CORNER) {
-      executeMenuCommand ('copy');
-      executeMenuCommand ('pasteFront');
-      pthCut = selection[0];
-      pthCut.pathPoints[0].remove ();
-      executeMenuCommand ('deselectall');
-    }
-  }
+  _emc_unite (pth);
+  _cut (pth);
   pth.remove ();
+
+  function _cut (pth) {
+    for (var i = 0; i < pth.pathPoints.length; i++) {
+      var pnt = pth.pathPoints[i];
+      if (pnt.pointType != PointType.CORNER) continue;
+      i = __addPathByTmpl (pth, i);
+    }
+
+    function __addPathByTmpl (pathTmpl, iStartPnt) {
+
+      var doc  = activeDocument,
+          j, pntTmpl, pth, pnt,
+          pnts = [pathTmpl.pathPoints [iStartPnt]];
+
+      try {
+        for (j = 1; j < pathTmpl.pathPoints.length + 1; j++) {
+          pntTmpl = pathTmpl.pathPoints[j + iStartPnt];
+          if (pntTmpl.pointType == PointType.CORNER) {
+            pnts.push (pntTmpl);
+            break;
+          }
+          pntTmpl = pathTmpl.pathPoints[j + iStartPnt];
+          pnts.push (pntTmpl);
+        }
+      } catch (e) {
+        for (j = 0; j < iStartPnt + 1; j++) {
+          pntTmpl = pathTmpl.pathPoints[j];
+          if (pntTmpl.pointType == PointType.CORNER) {
+            pnts.push (pntTmpl);
+            break;
+          }
+          pntTmpl = pathTmpl.pathPoints[j];
+          pnts.push (pntTmpl);
+        }
+      }
+      pth = doc.pathItems.add ();
+      for (var i = 0; i < pnts.length; i++) {
+        var pnt          = pnts[i];
+        var p            = pth.pathPoints.add ();
+        p.anchor         = [pnt.anchor[0], pnt.anchor[1]];
+        p.leftDirection  = [pnt.leftDirection[0], pnt.leftDirection[1]];
+        p.rightDirection = [pnt.rightDirection[0], pnt.rightDirection[1]];
+        p.pointType      = pnt.pointType;
+      }
+      return j;
+    }
+  }
+
+  function _emc_unite (pth) {
+    executeMenuCommand ('deselectall');
+    pth.selected = true;
+    executeMenuCommand ("group");
+    executeMenuCommand ("Live Pathfinder Add");
+    executeMenuCommand ("expandStyle");
+    executeMenuCommand ("ungroupall");
+    executeMenuCommand ('deselectall');
+  }
 }
-
-

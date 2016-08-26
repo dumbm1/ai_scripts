@@ -55,6 +55,7 @@
  Live Adobe Round Corners
  Live Feather
  Live Transform
+ Live Pathfinder Add
  lock
  LowerCase Change Case Item
  Make Envelope
