@@ -5,7 +5,7 @@
  *
  * What's new:
  * * Added processing collections
- *
+ * 
  * Using:
  * * Select group[s] or path item[s];
  * * Run the script
