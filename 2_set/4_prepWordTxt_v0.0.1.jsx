@@ -26,6 +26,43 @@
   activeDocument.saveAs (aiFile, saveOpts);
 
   userInteractionLevel = userInteract;
+	
+	function testSplitToParagraphs(){
+var reg = /(.+)?(^$\s)?(^.+?$)(^$)(.+)/gm;
+var replacer = '$3';
+var txtFrame = selection[0];
+var result = reg.exec (txtFrame.contents);
+      try {
+        var currMatch      = txtFrame.characters[result.index];
+        currMatch.length   = result[0].length;
+        currMatch.contents = currMatch.contents.replace (reg, replacer);
+        // !!! when the match.length is different with the replacer.length the loop becomes infinite
+        reg.lastIndex += replacer.length - result[0].length;
+      } catch (e) {
+      }
+   reg.lastIndex = txtFrame.contents.length ;
+    $.writeln(reg.lastIndex);
+    
+var txtFrame2 = selection[1];
+result = reg.exec (txtFrame2.contents);
+      try {
+        currMatch      = txtFrame2.characters[result.index];
+        currMatch.length   = result[0].length;
+        currMatch.contents = currMatch.contents.replace (reg, replacer);
+        // !!! when the match.length is different with the replacer.length the loop becomes infinite
+       
+        reg.lastIndex = txtFrame.contents.length + txtFrame2.contents.length;
+       
+      } catch (e) {
+      }
+    $.writeln(reg.lastIndex);
+    
+  var a = txtFrame2.characters[0];
+a.length = txtFrame.contents.length;
+a.contents = '';
+    
+    
+	}
 
   function processText () {
     var kCol   = new CMYKColor ();
