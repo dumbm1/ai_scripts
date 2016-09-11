@@ -1,11 +1,12 @@
 /**
  * ai.jsx (c)MaratShagiev m_js@bk.ru 03.08.2016.
- * 
- * prepWordTxt_v0.0.1.jsx
+ *
+ * prepWordTxt_v1.0.jsx
+ *
+ * todo: Illustrator bug: I can't sign fill color black 100%
  */
-//todo: 5. add split text to separate frames by end of line separator (enter)
-////@target illustrator
-(function processTxtChanges () {
+
+(function prepareMSWordDoc () {
   var userInteract     = userInteractionLevel;
   userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
 
@@ -16,9 +17,15 @@
   var openOpts = new OpenOptions ();
   var saveOpts = new IllustratorSaveOptions ();
 
-  open (newFile, DocumentColorSpace.CMYK, openOpts);
+  open (newFile, DocumentColorSpace.RGB, openOpts);
+
   act_switchToCMYK ();
-  processText ();
+  setFrameSize ();
+  setFrameCol ();
+
+  executeMenuCommand ('selectall');
+  splitTxtFrames ();
+  executeMenuCommand ('Fit Artboard to artwork bounds');
 
   act_delAllUnused ();
 
@@ -26,62 +33,125 @@
   activeDocument.saveAs (aiFile, saveOpts);
 
   userInteractionLevel = userInteract;
-	
-	function testSplitToParagraphs(){
-var reg = /(.+)?(^$\s)?(^.+?$)(^$)(.+)/gm;
-var replacer = '$3';
-var txtFrame = selection[0];
-var result = reg.exec (txtFrame.contents);
-      try {
-        var currMatch      = txtFrame.characters[result.index];
-        currMatch.length   = result[0].length;
-        currMatch.contents = currMatch.contents.replace (reg, replacer);
-        // !!! when the match.length is different with the replacer.length the loop becomes infinite
-        reg.lastIndex += replacer.length - result[0].length;
-      } catch (e) {
-      }
-   reg.lastIndex = txtFrame.contents.length ;
-    $.writeln(reg.lastIndex);
-    
-var txtFrame2 = selection[1];
-result = reg.exec (txtFrame2.contents);
-      try {
-        currMatch      = txtFrame2.characters[result.index];
-        currMatch.length   = result[0].length;
-        currMatch.contents = currMatch.contents.replace (reg, replacer);
-        // !!! when the match.length is different with the replacer.length the loop becomes infinite
-       
-        reg.lastIndex = txtFrame.contents.length + txtFrame2.contents.length;
-       
-      } catch (e) {
-      }
-    $.writeln(reg.lastIndex);
-    
-  var a = txtFrame2.characters[0];
-a.length = txtFrame.contents.length;
-a.contents = '';
-    
-    
-	}
 
-  function processText () {
-    var kCol   = new CMYKColor ();
-    kCol.black = 100;
+  function splitTxtFrames () {
+    try {
+      var sel = selection;
+      if (!sel.length) throw new Error ('Select text frame and try again');
+      executeMenuCommand ('deselectall');
 
+      for (var i = 0; i < sel.length; i++) {
+        var obj = sel[i];
+        if (obj.typename != 'TextFrame') continue;
+        _splitTxt (obj);
+      }
+    } catch (e) {
+      alert (e.line + '\n' + e.message)
+    }
+
+    function _splitTxt (fr) {
+      var result,
+          resultFrames   = [],
+          prevSectionLen = 0,
+          re             = /(\s$)+/mg,
+          protectStart   = 1,
+          protectCount   = protectStart,
+          protectLim     = 10;
+
+      while (result = re.exec (fr.contents)) {
+
+        var currFr                 = fr.duplicate ();
+        var lastContentsToDel      = currFr.characters[result.index];
+        lastContentsToDel.length   = currFr.contents.length - result.index;
+        lastContentsToDel.contents = '';
+        if (prevSectionLen) {
+          var prevContentsToDel      = currFr.characters[0];
+          prevContentsToDel.length   = prevSectionLen;
+          prevContentsToDel.contents = '';
+        }
+        prevSectionLen += currFr.contents.length;
+        /**
+         *  Allow the user to forcibly abort, cause probably loop becomes infinite
+         *  */
+        if (protectCount % (protectLim + protectStart) == 0) {
+          if (confirm
+            ('It seems that the loop becomes infinite\n' +
+              'Current number of iterations is ' + (protectCount - (protectCount % protectLim)) + '\n' +
+              'Do you want to abort the script?')) break;
+        }
+        protectCount++;
+        resultFrames.push (currFr);
+      }
+
+      /**
+       * delete first and last empty strings around paragraph
+       * */
+      for (var i = 0; i < resultFrames.length; i++) {
+        var obj = resultFrames[i];
+        __delLastEmptyLine (obj);
+      }
+      for (i = 0; i < resultFrames.length; i++) {
+        obj = resultFrames[i];
+        __delFirstEmptyLine (obj);
+      }
+
+      fr.remove ();
+      /**
+       * positioning frames
+       * */
+      for (var j = 0, pos; j < resultFrames.length - 1; j++) {
+        var dupl                = (resultFrames[j].duplicate ()).createOutline ();
+        resultFrames[j + 1].top = dupl.geometricBounds[3] - 10;
+        dupl.remove ();
+      }
+
+      function __delLastEmptyLine (fr) {
+        try {
+          var reLast     = /\s$/gmi;
+          var resultLast = reLast.exec (fr.contents);
+          var currMatch;
+          if (resultLast) {
+            currMatch        = fr.characters[resultLast.index];
+            currMatch.length = resultLast[0].length;
+            currMatch.remove ();
+          }
+        } catch (e) {
+        }
+      }
+
+      function __delFirstEmptyLine (fr) {
+        try {
+          var reFirst     = /^$\s/gmi;
+          var resultFirst = reFirst.exec (fr.contents);
+          var currMatch;
+          if (resultFirst) {
+            currMatch        = fr.characters[resultFirst.index];
+            currMatch.length = resultFirst[0].length;
+            currMatch.remove ();
+          }
+        } catch (e) {
+        }
+      }
+    }
+  }
+
+  function setFrameSize () {
     var frMain   = activeDocument.textFrames[0];
     var frResult = activeDocument.textFrames.areaText (
       activeDocument.pathItems.rectangle (0, 0, frMain.width, frMain.width * 2)
     );
-
     frMain.textRange.duplicate (frResult, ElementPlacement.INSIDE);
     frResult.position = frMain.position;
-
-    frResult.textRange.characterAttributes.fillColor     = kCol;
-    frResult.textRange.characterAttributes.overprintFill = true;
-
     frMain.remove ();
+  }
 
-    executeMenuCommand ('Fit Artboard to artwork bounds');
+  function setFrameCol () {
+    var c  = new CMYKColor ();
+    c.cyan = 100;
+
+    var fr                                         = activeDocument.textFrames[0];
+    fr.textRange.characterAttributes.fillColor     = c;
+    fr.textRange.characterAttributes.overprintFill = true;
   }
 
   function act_delAllUnused () {
@@ -352,5 +422,25 @@ a.contents = '';
 
     app.doScript ("switchToCMYK", "switchToCMYK", false); // action name, set name
     app.unloadAction ("switchToCMYK", ""); // set name
+  }
+
+  /**
+   * todo: add ungroup swatchGroups
+   * Delete all swatches except Swatche.color.colorType == ColorModel.SPOT
+   * Delete all SwatchGroups except base
+   * */
+  function delNoSpotSwatches () {
+    var doc = activeDocument;
+    for (var i = doc.swatches.length - 1; i >= 0; i--) {
+      var sw = doc.swatches[i];
+      if (sw.color.typename == 'SpotColor') {
+        if (sw.color.spot.colorType == ColorModel.SPOT) continue;
+      }
+      sw.remove ();
+    }
+    for (var j = doc.swatchGroups.length - 1; j > 0; j--) {
+      var swGr = doc.swatchGroups[j];
+      swGr.remove ();
+    }
   }
 } ());
