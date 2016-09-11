@@ -5,6 +5,8 @@
  *
  * this use for load scripts to the action 
  * work only in manual start from menu File>Scripts (not from sturtup folder)
+ * or if at least one time was called the menu item File>Scripts
+ * because the scripts are loaded and became available
  * 
  * reloadActPan
  */

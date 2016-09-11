@@ -16,7 +16,7 @@ function splitTxt () {
       resultFrames   = [],
       fr             = selection[0],
       prevSectionLen = 0,
-      re             = /^$\s/mg,
+      re             = /(\s$)/mg,
       protectStart   = 1,
       protectCount   = protectStart,
       protectLim     = 10;
@@ -34,8 +34,10 @@ function splitTxt () {
       prevContentsToDel.length   = prevSectionLen;
       prevContentsToDel.contents = '';
     }
-    prevSectionLen += currFr.contents.length ;
-    /** Allow the user to forcibly abort, cause probably loop becomes infinite */
+    prevSectionLen += currFr.contents.length;
+    /**
+     *  Allow the user to forcibly abort, cause probably loop becomes infinite
+     *  */
     if (protectCount % (protectLim + protectStart) == 0) {
       if (confirm
         ('It seems that the loop becomes infinite\n' +
@@ -48,42 +50,49 @@ function splitTxt () {
 
   for (var i = 0; i < resultFrames.length; i++) {
     var obj = resultFrames[i];
-    delFirstEmptyLine (obj);
-  }
-  for (var i = 0; i < resultFrames.length; i++) {
-    var obj = resultFrames[i];
     delLastEmptyLine (obj);
   }
 
-
-
-  function delLastEmptyLine (fr) {
-    try {
-      var reLast       = /\s$/gm;
-      var resultLast   = reLast.exec (fr.contents)
-      var currMatch    = fr.characters[resultLast.index];
-      currMatch.length = resultLast[0].length;
-      currMatch.remove ();
-    } catch (e) {
-    }
+  for (i = 0; i < resultFrames.length; i++) {
+    var obj = resultFrames[i];
+    delFirstEmptyLine (obj);
   }
 
-  function delFirstEmptyLine (fr) {
-    try {
-      var reFirst      = /^$\s/gm;
-      var resultFirst  = reFirst.exec (fr.contents)
-      var currMatch    = fr.characters[resultFirst.index];
-      currMatch.length = resultFirst[0].length;
+  fr.remove ();
+}
+
+function delLastEmptyLine (fr) {
+  try {
+    var reLast     = /\s$/gmi;
+    var resultLast = reLast.exec (fr.contents);
+    var currMatch;
+    if (resultLast) {
+      currMatch        = fr.characters[resultLast.index];
+      currMatch.length = resultLast[0].length;
       currMatch.remove ();
-    } catch (e) {
     }
+  } catch (e) {
+    // alert ('error in delFirstEmptyLine function\n' + e.line + '\n' + e.message);
   }
 }
 
+function delFirstEmptyLine (fr) {
+  try {
+    var reFirst     = /^$\s/gmi;
+    var resultFirst = reFirst.exec (fr.contents);
+    var currMatch;
+    if (resultFirst) {
+      currMatch        = fr.characters[resultFirst.index];
+      currMatch.length = resultFirst[0].length;
+      currMatch.remove ();
+    }
+  } catch (e) {
+    // alert ('error in delFirstEmptyLine function\n' + e.line + '\n' + e.message);
+  }
+}
 function clearConsole () {
   var bt    = new BridgeTalk ();
   bt.target = 'estoolkit';
   bt.body   = 'app.clc();';
   bt.send ();
 }
-

@@ -1,5 +1,4 @@
-/*
-
+/**
  Add Anchor Points2
  Adjust3
  Adobe AI Save For Web
@@ -114,7 +113,6 @@
  unlockAll
  UpperCase Change Case Item
  new
-
  */
 /*
 new,新建
