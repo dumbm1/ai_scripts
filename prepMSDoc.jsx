@@ -6,22 +6,32 @@
  * todo: Illustrator bug: I can't sign fill color black 100%
  */
 
-(function prepareMSWordDoc () {
+(function prepMSDoc () {
   var userInteract     = userInteractionLevel;
   userInteractionLevel = UserInteractionLevel.DONTDISPLAYALERTS;
+  var pth, thisFile, newFile, openOpts, saveOpts;
 
-  var pth      = activeDocument.fullName;
-  var thisFile = new File (pth);
-  var newFile  = thisFile.openDlg ();
+  if (documents.length) {
+    pth      = activeDocument.fullName;
+    thisFile = new File (pth);
+    newFile  = thisFile.openDlg ();
+  } else {
+    newFile = File.openDialog ('Open MSDoc file', 'MS Word DOC file:*.doc', true);
+    if (!newFile) return;
+  }
 
-  var openOpts = new OpenOptions ();
-  var saveOpts = new IllustratorSaveOptions ();
+  openOpts = new OpenOptions ();
+  saveOpts = new IllustratorSaveOptions ();
 
   open (newFile, DocumentColorSpace.RGB, openOpts);
 
   act_switchToCMYK ();
+
   setFrameSize ();
-  setFrameCol ();
+  activeDocument.textFrames[0].selected = true;
+  act_setBlack100();
+
+ // setFrameCol ();
 
   executeMenuCommand ('selectall');
   splitTxtFrames ();
@@ -359,7 +369,99 @@
     }
   }
 
-  function act_switchToCMYK () {
+  function act_setBlack100 () {
+
+    {
+      var actStr = '' +
+        '/version 3'+
+        '/name [ 8'+
+        '	626c61636b313030'+
+        ']'+
+        '/isOpen 1'+
+        '/actionCount 1'+
+        '/action-1 {'+
+        '	/name [ 8'+
+        '		626c61636b313030'+
+        '	]'+
+        '	/keyIndex 0'+
+        '	/colorIndex 0'+
+        '	/isOpen 1'+
+        '	/eventCount 1'+
+        '	/event-1 {'+
+        '		/useRulersIn1stQuadrant 0'+
+        '		/internalName (ai_plugin_setColor)'+
+        '		/localizedName [ 9'+
+        '			53657420636f6c6f72'+
+        '		]'+
+        '		/isOpen 1'+
+        '		/isOn 1'+
+        '		/hasDialog 0'+
+        '		/parameterCount 7'+
+        '		/parameter-1 {'+
+        '			/key 1768186740'+
+        '			/showInPalette -1'+
+        '			/type (ustring)'+
+        '			/value [ 10'+
+        '				46696c6c20636f6c6f72'+
+        '			]'+
+        '		}'+
+        '		/parameter-2 {'+
+        '			/key 1718185068'+
+        '			/showInPalette -1'+
+        '			/type (boolean)'+
+        '			/value 1'+
+        '		}'+
+        '		/parameter-3 {'+
+        '			/key 1954115685'+
+        '			/showInPalette -1'+
+        '			/type (enumerated)'+
+        '			/name [ 10'+
+        '				434d594b20636f6c6f72'+
+        '			]'+
+        '			/value 4'+
+        '		}'+
+        '		/parameter-4 {'+
+        '			/key 1668899182'+
+        '			/showInPalette -1'+
+        '			/type (unit real)'+
+        '			/value 0.0'+
+        '			/unit 592474723'+
+        '		}'+
+        '		/parameter-5 {'+
+        '			/key 1835496545'+
+        '			/showInPalette -1'+
+        '			/type (unit real)'+
+        '			/value 0.0'+
+        '			/unit 592474723'+
+        '		}'+
+        '		/parameter-6 {'+
+        '			/key 2036690039'+
+        '			/showInPalette -1'+
+        '			/type (unit real)'+
+        '			/value 0.0'+
+        '			/unit 592474723'+
+        '		}'+
+        '		/parameter-7 {'+
+        '			/key 1651270507'+
+        '			/showInPalette -1'+
+        '			/type (unit real)'+
+        '			/value 100.0'+
+        '			/unit 592474723'+
+        '		}'+
+        '	}'+
+        '}'
+    }
+
+    var f = new File ('~/ScriptAction.aia');
+    f.open ('w');
+    f.write (actStr);
+    f.close ();
+    app.loadAction (f);
+    f.remove ();
+
+    app.doScript ("black100", "black100", false); // action name, set name
+    app.unloadAction ("black100", ""); // set name
+  }function act_switchToCMYK () {
 
     {
       var actStr = '' +
