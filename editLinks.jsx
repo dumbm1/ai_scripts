@@ -1,11 +1,7 @@
 /**
- * ai.jsx (c)MaratShagiev m_js@bk.ru 01-03-2016
+ * ai.jsx (c)MaratShagiev m_js@bk.ru 18.09.2016
  *
- * editLinks_v0.3
- *
- * open all selected links
- *
- * whats new:
+ * editLinks_1.0
  * open linked files according to the extension
  * for example: the photoshop eps links open in photoshop
  */
@@ -13,8 +9,7 @@
 //@target illustrator
 
 (function editLinks () {
-  var /*start = new Date (), // benchmarking*/
-      links = activeDocument.placedItems,
+  var links = activeDocument.placedItems,
       paths = {};
 
   for (var i = 0; i < links.length; i++) {
@@ -57,9 +52,8 @@
     }
   }
 
-  // alert ('Total time (without Photoshop work):\n' + _formatMs (new Date () - start)); // sample banchmarking
   /**
-   * THE LIBRARY
+   * LIB
    * */
   function _openInPhotoshop (filePath) {
     var bt    = new BridgeTalk ();
@@ -70,10 +64,6 @@
 
   function _openInIllustrator (filePath) {
     open (new File (filePath));
-    // var bt    = new BridgeTalk ();
-    // bt.target = 'illustraror';
-    // bt.body   = 'var f = (new File("' + filePath + '")); app.open(f);';
-    // bt.send ();
   }
 
   function _processEps (filePath) {
@@ -91,17 +81,4 @@
 
     epsFile.close ();
   }
-
-  function _formatMs (millisec) {
-
-    var date       = new Date (millisec),
-        formatDate =
-          ('00' + date.getUTCHours ()).slice (-2) + ':' +
-          ('00' + date.getMinutes ()).slice (-2) + ':' +
-          ('00' + date.getSeconds ()).slice (-2) + ':' +
-          ('000' + date.getMilliseconds ()).slice (-3);
-
-    return formatDate;
-  }
-
 } () );
