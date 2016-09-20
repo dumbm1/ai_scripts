@@ -1,5 +1,7 @@
 /**
- # ai.jsx (c)MaratShagiev m_js@bk.ru 10.09.2016
+ # ai.jsx (c)MaratShagiev m_js@bk.ru 20.09.2016
+
+ splitTxtFrames_v1.1
 
  ## main algorithm (in while loop in function _splitTxt):
  * if match (empty line) then duplicate the base frame
@@ -30,6 +32,10 @@
         protectStart   = 1,
         protectCount   = protectStart,
         protectLim     = 10;
+
+    fr.characters[fr.characters.length - 1].contents += '\r';
+
+    __delDoubleEmpty (fr);
 
     while (result = re.exec (fr.contents)) {
 
@@ -103,6 +109,23 @@
           currMatch.remove ();
         }
       } catch (e) {
+      }
+    }
+
+    function __delDoubleEmpty (fr) {
+      var re       = /(\s^$){2,}/gmi;
+      var replacer = '\r';
+
+      while (result = re.exec (fr.contents)) {
+        try {
+          var currMatch      = fr.characters[result.index];
+          currMatch.length   = result[0].length;
+          // currMatch.contents = currMatch.contents.replace (re, replacer);
+          currMatch.contents = replacer;
+          // !!! when the match.length is different with the replacer.length the loop becomes infinite
+          // re.lastIndex += currMatch.contents.length - result[0].length;
+        } catch (e) {
+        }
       }
     }
   }
