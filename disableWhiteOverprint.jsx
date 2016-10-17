@@ -1,28 +1,18 @@
 /**
  * ai.jsx (c)MaratShagiev m_js@bk.ru 17.10.2016.
  *
- * disableWhiteOverprint
- *
- * GREAT DESTINATION:
- * test active document for white overprints
- * IF FIND:
- * - recolor grey-white and spot-white to CMYK-white,
- * - remove white overprints
- * - support color models: CMYK, SPOT and GRAYSCALE
- * - support class objects: Path, CompaoundPath, TextRrame
- *
- * - text-frames processed as indivisible single objects
- * rather then characters collections (couse it was a slow tempo)
+ * disableWhiteOverprint 0.4
  */
 //@target illustrator
-//@targetengine session
 (function disableWhiteOverprint () {
-  var globalCount = 0;
-  var win         = new Window ('dialog', 'Disable White Overprint');
-  var count       = win.add ('statictext', [0, 0, 200, 20], 'Process status: ');
-  var btnGr       = win.add ('group');
-  var btnOk       = btnGr.add ('button', undefined, 'OK');
-  var btnClose    = btnGr.add ('button', undefined, 'Close');
+  var globalCount = 0,
+      errCount    = 0;
+
+  var win         = new Window ('dialog', 'Disable White Overprint'),
+      count       = win.add ('statictext', [0, 0, 200, 40], 'Process status: ', {Multiline: true}),
+      btnGr       = win.add ('group'),
+      btnOk       = btnGr.add ('button', undefined, 'Start'),
+      btnClose    = btnGr.add ('button', undefined, 'Close');
 
   btnClose.onClick = function () {
     win.close ();
@@ -34,79 +24,56 @@
   win.show ();
 
   function killer () {
-    var doc         = activeDocument;
-    var cmykWhite   = new CMYKColor ();
-    var pathCollect = doc.pathItems;
-    var compCollect = doc.compoundPathItems;
-    var txtCollect  = doc.textFrames;
+    var doc         = activeDocument,
+        cmykWhite   = new CMYKColor (),
+        pathCollect = doc.pathItems,
+        compCollect = doc.compoundPathItems,
+        txtCollect  = doc.textFrames;
 
-    // if current document  have no supported elements, out function
     if (pathCollect.length == 0 && compCollect.length == 0 && txtCollect.length == 0) {
-      alert ('No supported elements');
+      _updWin ('No supported elements');
       return;
     }
 
-    // the array for all collected elements
-    var elemArr = [];
-
-    // push all elems to array
-    for (var p = 0; p < pathCollect.length; p++) {
+    for (var p = 0, pCount = 0; p < pathCollect.length; p++) {
       if (pathCollect[p].parent.typename == "CompoundPathItem") continue; // avoid duplicating objects
-      elemArr.push (pathCollect[p]);
-      _updWin ('path count: ' + p);
+      _killerWeapon (pathCollect[p]);
+      pCount++;
+      _updWin ('Paths: ' + pCount);
     }
     $.sleep (1000);
 
     for (var c = 0; c < compCollect.length; c++) {
-      elemArr.push (compCollect[c]);
-      _updWin ('compound path count: ' + c);
+      _killerWeapon (compCollect[c].pathItems[0]);
+      _updWin ('Compound paths: ' + c);
     }
     $.sleep (1000);
 
     for (var t = 0; t < txtCollect.length; t++) {
-      elemArr.push (txtCollect[t]);
-      _updWin ('text count: ' + t);
+      /**
+       * slowly, more accurate (overprint discards from only white chars)
+       * */
+      var frameChars = txtCollect[t].textRange.characters;
+      for (var i = 0; i < frameChars.length; i++) {
+        _killerWeapon (frameChars[i].characterAttributes);
+      }
+      /**
+       * faster, but overprint discards from all text frame
+       */
+      // _killerWeapon (txtCollect[t].textRange);
+
+      _updWin ('Characters: ' + t);
     }
     $.sleep (1000);
 
-    // scanning, finding and killing
-    for (var j = 0; j < elemArr.length; j++) {
-      _updWin (j);
-      //  depending on the typename of elems define vars elem.fillColor and elem.strokeColor
-      try {
-        switch (elemArr[j].typename) {
-          case 'PathItem':
-            _killerWeapon (elemArr[j]);
-            break;
-          case 'CompoundPathItem':
-            _killerWeapon (elemArr[j].pathItems[0]);
-            break;
-          case 'TextFrame':
-            // textFrame as a collection of characters
-            /*
-             var frameChars = elemArr[j].textRange.characters;
-             for (var i = 0; i < frameChars.length; i++) {
-             _killerWeapon(frameChars[i].characterAttributes);
-             }
-             */
-            // textFrame as a single indivisible object
-            var frameChars = elemArr[j].textRange;
-            _killerWeapon (frameChars.characterAttributes);
-            break;
-          default:
-            // default action
-            break;
-        }
-      } catch (e) {
-      }
-    }
+    _updWin ('Discards white overprints: ' + globalCount + '\n' + 'Error count: ' + errCount);
+    return;
 
-    _updWin ('Process Items Count: ' + globalCount);
-
-    // COMMON TOOL
+    /**
+     * LIB
+     */
     function _killerWeapon (elem) {
-      // SPOT
-      // fill
+      // SPOT fill
       try {
         if ((elem.fillColor + '' ) == '[SpotColor]' && elem.fillColor.tint < 1 &&
           (elem.fillOverprint == true || elem.overprintFill == true)) {
@@ -115,11 +82,11 @@
           elem.fillOverprint       = false;
           elem.overprintFill       = false;
           globalCount++;
-          return;
         }
       } catch (e) {
+        errCount++;
       }
-      // stroke
+      // SPOT stroke
       try {
         if ((elem.strokeColor + '' ) == '[SpotColor]' && elem.strokeColor.tint < 1 &&
           (elem.strokeOverprint == true || elem.overprintStroke == true)) {
@@ -128,12 +95,11 @@
           elem.strokeOverprint       = false;
           elem.overprintStroke       = false;
           globalCount++;
-          return;
         }
       } catch (e) {
+        errCount++;
       }
-      // CMYK
-      // fill
+      // CMYK fill
       try {
         if ((elem.fillColor + '' ) == '[CMYKColor]' &&
           (elem.fillOverprint == true || elem.overprintFill == true)) {
@@ -143,13 +109,13 @@
               elem.fillOverprint = false;
               elem.overprintFill = false;
               globalCount++;
-              return;
             }
           }
         }
       } catch (e) {
+        errCount++;
       }
-      //stroke
+      // CMYK stroke
       try {
         if ((elem.strokeColor + '' ) == '[CMYKColor]' &&
           (elem.strokeOverprint == true || elem.overprintStroke == true)) {
@@ -159,14 +125,13 @@
               elem.strokeOverprint = false;
               elem.overprintStroke = false;
               globalCount++;
-              return;
             }
           }
         }
       } catch (e) {
+        errCount++;
       }
-      // GRAYSCALE
-      // fill
+      // GRAYSCALE fill
       try {
         if ((elem.fillColor + '' ) == '[GrayColor]' && elem.fillColor.gray < 1 &&
           (elem.fillOverprint == true || elem.overprintFill == true)) {
@@ -174,11 +139,11 @@
           elem.overprintFill = false;
           elem.fillColor     = cmykWhite;
           globalCount++;
-          return;
         }
       } catch (e) {
+        errCount++;
       }
-      //stroke
+      // GRAYSCALE stroke
       try {
         if ((elem.strokeColor + '' ) == '[GrayColor]' && elem.strokeColor.gray < 1 &&
           (elem.strokeOverprint == true || elem.overprintStroke == true)) {
@@ -186,9 +151,9 @@
           elem.overprintStroke = false;
           elem.strokeColor     = cmykWhite;
           globalCount++;
-          return;
         }
       } catch (e) {
+        errCount++;
       }
     }
 
