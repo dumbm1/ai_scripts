@@ -1,0 +1,12 @@
+Название: MakeCropMarksAI.jsx
+Приложение для использования: Adobe Illustrator CS3, CS4, CS5, CS6
+Версия: 1.4
+Язык реализации (Среда): JavaScript (ExtendScript Toolkit 2)
+Операционные системы (Платформы): PC, Macintosh (Windows, Mac OS)
+Условия распространения: Бесплатно; На Ваш риск
+Назначение: Создание меток реза
+Функциональные ограничения: Не работает с выделенными направляющими
+Примечание: Создается дополнительный файл MakeCropMarksAI.ini для хранения настроек  
+в папке с приложением Adobe Illustrator
+Техническая поддержка: Sergey-Anosov@yandex.ru
+https://sites.google.com/site/dtpscripting

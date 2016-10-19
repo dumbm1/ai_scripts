@@ -105,7 +105,7 @@
  Colors8
  Colors9
  compoundPath
- control palette plugin
+ control palette pluginsame
  convertlegacyText
  convertlegacyText1
  convertlegacyText2

@@ -1,0 +1,12 @@
+Name: MakeCropMarksAI.jsx
+Application to use with: Adobe Illustrator CS3, CS4, CS5, CS6
+Version: 1.4
+Program language (Environment): JavaScript (ExtendScript Toolkit 2)
+Operating systems (Platforms): PC, Macintosh (Windows, Mac OS)
+Distribution conditions: Freeware; At your own risk
+Functions: Makes crop marks 
+Functional limitations: Can not process selected guides
+Note: Creates additional file MakeCropMarksAI.ini for setup data in the folder where
+the application Adobe Illustrator is.
+Technical support: Sergey-Anosov@yandex.ru
+https://sites.google.com/site/dtpscripting
