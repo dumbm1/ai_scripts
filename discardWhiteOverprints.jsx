@@ -1,9 +1,9 @@
 /**
- * ai.jsx (c)MaratShagiev m_js@bk.ru 17.10.2016.
+ * ai.jsx (c)MaratShagiev m_js@bk.ru 21.10.2016.
  *
- * disableWhiteOverprint 0.5
+ * disableWhiteOverprint 0.6
  */
-//@target illustrator-19
+//@target illustrator
 (function disableWhiteOverprint () {
   var discardCount = 0,
       errCount     = 0,
@@ -16,7 +16,7 @@
       btnGr       = win.add ('group'),
       btnOk       = btnGr.add ('button', undefined, 'Start'),
       btnClose    = btnGr.add ('button', undefined, 'Close'),
-      btnQuit     = btnGr.add ('button', undefined, 'Quit');
+      btnQuit     = btnGr.add ('button', undefined, '!!Quit');
 
   reportTitle.alignment = 'left';
 
@@ -42,7 +42,6 @@
     }
 
     for (var p = 0; p < doc.pathItems.length; p++) {
-      //    if (_isLock (doc.pathItems[p])) continue;
       _updWin (msg + 'Paths: ' + p);
       if (doc.pathItems[p].parent.typename == "CompoundPathItem") {
         _discardInPath (doc.pathItems[p].parent.pathItems[0]);
@@ -53,7 +52,6 @@
     msg += 'Paths: ' + p + '\n';
 
     for (var t = 0, chrCount = 0; t < doc.textFrames.length; t++) {
-      //   if (_isLock (doc.textFrames[t])) continue;
       var frameChars = doc.textFrames[t].textRange.characters;
       for (var c = 0; c < frameChars.length; c++) {
         _discardInText (frameChars[c].characterAttributes);
@@ -77,14 +75,22 @@
           elem.fillOverprint       = false;
           discardCount++;
         }
-        // SPOT stroke
+      } catch (e) {
+        _storeErr (e);
+      }
+      // SPOT stroke
+      try {
         if ((elem.strokeColor + '' ) == '[SpotColor]' && elem.strokeColor.tint < 1 && (elem.strokeOverprint == true)) {
           elem.strokeColor.colorType = ColorModel.PROCESS;
           elem.strokeColor           = cmykWhite;
           elem.strokeOverprint       = false;
           discardCount++;
         }
-        // CMYK fill
+      } catch (e) {
+        _storeErr (e);
+      }
+      // CMYK fill
+      try {
         if ((elem.fillColor + '' ) == '[CMYKColor]' && (elem.fillOverprint == true )) {
           if (
             elem.fillColor.cyan < 1 && elem.fillColor.magenta < 1 &&
@@ -93,7 +99,11 @@
             discardCount++
           }
         }
-        // CMYK stroke
+      } catch (e) {
+        _storeErr (e);
+      }
+      // CMYK stroke
+      try {
         if ((elem.strokeColor + '' ) == '[CMYKColor]' && (elem.strokeOverprint == true )) {
           if (elem.strokeColor.cyan < 1 && elem.strokeColor.magenta < 1 &&
             elem.strokeColor.yellow < 1 && elem.strokeColor.black < 1) {
@@ -102,13 +112,21 @@
             discardCount++;
           }
         }
-        // GRAYSCALE fill
+      } catch (e) {
+        _storeErr (e);
+      }
+      // GRAYSCALE fill
+      try {
         if ((elem.fillColor + '' ) == '[GrayColor]' && elem.fillColor.gray < 1 && (elem.fillOverprint == true )) {
           elem.fillColor     = cmykWhite;
           elem.fillOverprint = false;
           discardCount++
         }
-        // GRAYSCALE stroke
+      } catch (e) {
+        _storeErr (e);
+      }
+      // GRAYSCALE stroke
+      try {
         if ((elem.strokeColor + '' ) == '[GrayColor]' && elem.strokeColor.gray < 1 && (elem.strokeOverprint == true )) {
           elem.strokeColor     = cmykWhite;
           elem.strokeOverprint = false;
@@ -117,6 +135,7 @@
       } catch (e) {
         _storeErr (e);
       }
+
     }
 
     function _discardInText (elem) {
@@ -128,14 +147,22 @@
           elem.overprintFill       = false;
           discardCount++;
         }
-        // SPOT stroke
+      } catch (e) {
+        _storeErr (e);
+      }
+      // SPOT stroke
+      try {
         if ((elem.strokeColor + '' ) == '[SpotColor]' && elem.strokeColor.tint < 1 && (elem.overprintStroke == true)) {
           elem.strokeColor.colorType = ColorModel.PROCESS;
           elem.strokeColor           = cmykWhite;
           elem.overprintStroke       = false;
           discardCount++;
         }
-        // CMYK fill
+      } catch (e) {
+        _storeErr (e);
+      }
+      // CMYK fill
+      try {
         if ((elem.fillColor + '' ) == '[CMYKColor]' &&
           (elem.fillOverprint == true || elem.overprintFill == true)) {
           for (var l = 0; l < 3; l++) {
@@ -146,7 +173,11 @@
             }
           }
         }
-        // CMYK stroke
+      } catch (e) {
+        _storeErr (e);
+      }
+      // CMYK stroke
+      try {
         if ((elem.strokeColor + '' ) == '[CMYKColor]' &&
           (elem.strokeOverprint == true || elem.overprintStroke == true)) {
           for (var l = 0; l < 3; l++) {
@@ -157,13 +188,21 @@
             }
           }
         }
-        // GRAYSCALE fill
+      } catch (e) {
+        _storeErr (e);
+      }
+      // GRAYSCALE fill
+      try {
         if ((elem.fillColor + '' ) == '[GrayColor]' && elem.fillColor.gray < 1 && (elem.overprintFill == true)) {
           elem.overprintFill = false;
           elem.fillColor     = cmykWhite;
           discardCount++;
         }
-        // GRAYSCALE stroke
+      } catch (e) {
+        _storeErr (e);
+      }
+      // GRAYSCALE stroke
+      try {
         if ((elem.strokeColor + '' ) == '[GrayColor]' && elem.strokeColor.gray < 1 && (elem.overprintStroke == true)) {
           elem.overprintStroke = false;
           elem.strokeColor     = cmykWhite;
@@ -182,20 +221,6 @@
     function _storeErr (e) {
       errCount++;
       errMsgs.push (e.message);
-    }
-
-    /**
-     * @param {PageItem}
-     * @return {Boolean}
-     * */
-    function _isLock (elem) {
-      try {
-        elem.selected = true;
-        elem.selected = false;
-        return false;
-      } catch (e) {
-        return true;
-      }
     }
   }
 
