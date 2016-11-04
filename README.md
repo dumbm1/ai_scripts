@@ -1,6 +1,6 @@
-# Adobe ExtendScript for Illustrator
+#Adobe ExtendScript for Illustrator
 
-##Unordered set.
+##Unordered set of ~40 scripts and ui-scripts
 
 ###The main purpose is: 
 
@@ -12,3 +12,5 @@
   * flexo prepress etc
 
 * addition of some functions of Illustrator
+
+![ui_preview](img/ui_preview.png)
