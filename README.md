@@ -10,6 +10,9 @@
   * coordination of design
   * flexo prepress
   * etc...
+  
+![ui_preview](img/ui_preview.png)
+  
 * addition of some functions of Illustrator
 
 * library of ~60 common helpfull functions, like:
@@ -19,11 +22,11 @@
   * actScale
   * etc...
   
-* scripts by other autors:
+* excellent scripts of another cool authors:
   * \_MBK_
   * Carlos Santo
   * Sato Hiroyuki
   * Sergey Anosov
   * Vasily Hall
 
-![ui_preview](img/ui_preview.png)
+
