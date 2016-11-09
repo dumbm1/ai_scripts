@@ -25,7 +25,7 @@
   
 * excellent scripts of another cool authors:
     * \_MBK_
-    * Carlos Santo
+    * CarlosCanto
     * Sato Hiroyuki
     * Sergey Anosov
     * Vasily Hall
