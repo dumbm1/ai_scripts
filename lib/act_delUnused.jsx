@@ -2,8 +2,9 @@
  * ai.jsx (c)MaratShagiev m_js@bk.ru 04.08.2016.
  */
 
-(function act_delAllUnused () {
-  delNoSpotSwatches ();
+(function act_delAllUnused() {
+  var sel = deselAllSw(activeDocument);
+  delNoSpotSwatches();
 
   {
     var str = '/version 3' +
@@ -186,36 +187,75 @@
       '	}' +
       '}'
   }
-  runAction ('delAllUnused', 'delAllUnused', str);
+  runAction('delAllUnused', 'delAllUnused', str);
+  for (var i = 0; i < sel.length; i++) {
+    var item     = sel[i];
+    item.slected = true;
+  }
 
   /**
    * todo: add ungroup swatchGroups
    * Delete all swatches except Swatche.color.colorType == ColorModel.SPOT
    * Delete all SwatchGroups except base
    * */
-  function delNoSpotSwatches () {
+  function delNoSpotSwatches() {
     var doc = activeDocument;
     for (var i = doc.swatches.length - 1; i >= 0; i--) {
       var sw = doc.swatches[i];
       if (sw.color.typename == 'SpotColor') {
         if (sw.color.spot.colorType == ColorModel.SPOT) continue;
       }
-      sw.remove ();
+      sw.remove();
     }
     for (var j = doc.swatchGroups.length - 1; j > 0; j--) {
       var swGr = doc.swatchGroups[j];
-      swGr.remove ();
+      if (swGr.getAllSwatches().length) continue;
+      swGr.remove();
     }
   }
 
-  function runAction (actName, setName, actStr) {
-    var f = new File ('~/ScriptAction.aia');
-    f.open ('w');
-    f.write (actStr);
-    f.close ();
-    app.loadAction (f);
-    f.remove ();
-    app.doScript (actName, setName, false); // action name, set name
-    app.unloadAction (setName, ""); // set name
+  function runAction(actName, setName, actStr) {
+    var f = new File('~/ScriptAction.aia');
+    f.open('w');
+    f.write(actStr);
+    f.close();
+    app.loadAction(f);
+    f.remove();
+    app.doScript(actName, setName, false); // action name, set name
+    app.unloadAction(setName, ""); // set name
   }
-} ());
+
+  /**
+   * deselect all selected PageItems, Swatches and SwatchGroups
+   * across creating new temp path and new temp swatch
+   *
+   * @param {Document} doc - Object of Illustrator DOM Document class
+   * @return {Array} sel - the objects that were selected before the script starts
+   * */
+  function deselAllSw(doc) {
+    var sel = selection;
+
+    var tmpSw  = doc.swatches.add(),
+        swCol  = new CMYKColor(),
+        tmpPth = doc.activeLayer.pathItems.rectangle(0, 0, 100, 100);
+
+    executeMenuCommand('deselectall');
+
+    tmpSw.name       = '__temp_swatch_to_delete_xyz__';
+    swCol.cyan       = 30;
+    swCol.yellow     = 100;
+    swCol.black      = 0;
+    swCol.magenta    = 0;
+    tmpSw.color      = swCol;
+    tmpPth.stroked   = false;
+    tmpPth.fillColor = tmpSw.color;
+    tmpPth.selected  = true;
+    tmpPth.remove();
+    tmpSw.remove();
+
+    return sel;
+  }
+
+
+
+}());
