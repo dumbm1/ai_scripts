@@ -1,9 +1,9 @@
-﻿//@target illustrator
-getMaxCollectionBnds(selection, 'geometricBounds');
+﻿//@target illustrator-21
+getMaxCollectionBnds(activeDocument.pathItems, 'geometricBounds');
 /**
  * get maximum bounds of the collection of the elements or one element
  *
- * @param {Array/PageItem} collection
+ * @param {Array/PageItems/PageItem} collection - array, collection or PageItem
  * @param {String} boundsType - geometricBounds or visibleBounds
  * @return {Array} bounds - array af the maximal bounds of the entire colleciton or element
  * */
@@ -21,10 +21,12 @@ function getMaxCollectionBnds(collection, boundsType) {
   function _getMaxBnds(collection, bounds) {
     var bnds = bounds;
     // case then passed one item rather then true collection
-    if (collection.typename == 'PathItem' ||
-      collection.typename == 'CompoundPathItem' ||
-      collection.typename == 'TextFrame') {
-      return _cmprBnds(collection, bnds);
+    try {
+      var oneElemBnds = collection[boundsType];
+      if (oneElemBnds[0]) {
+        return oneElemBnds;
+      }
+    } catch (e) {
     }
     for (var j = 0; j < collection.length; j++) {
       var el = collection [j];
@@ -66,6 +68,7 @@ function getMaxCollectionBnds(collection, boundsType) {
     }
     return bnds;
   }
+
   /**
    * comparing the geometricBounds of two PageItems
    *
@@ -82,6 +85,7 @@ function getMaxCollectionBnds(collection, boundsType) {
       Math.min(elemBnds[3], bndsToCompare[3])
     ]
   }
+
   /**
    * get the bounds of one element
    *
