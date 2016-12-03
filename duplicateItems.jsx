@@ -2,17 +2,22 @@
  * Adobe ExtendScript for Illustrator CS6+
  * (c) Marat Shagiev
  * e-mail: m_js@bk.ru
- * 02.12.2016
+ * 04.12.2016
+ *
+ * duplicateItems_v1.0
  * */
 //@target illustrator
 
-(function moveExtend() {
+(function duplicateItems() {
   if (!selection.length) {
-    throw new Error('No selection');
+    alert('Select an item[s] that you need to duplicate.\nRun the script.');
     return;
   }
+  if (!documents.length) {
+    alert('Open/make document.\nSelect item[s] that you need to duplicate.\nRun the script.');
+  }
 
-  var store       = new Store('moveExtend');
+  var store       = new Store('duplicateItems');
   var previewFlag = false;
   var duplicates  = [];
 
@@ -58,9 +63,9 @@
     if (!previewFlag) {
       var opts = store.getFaceValues(win);
       var core = new Core(opts);
-      core.main();
+      core.duplicate();
     }
-    if (win.gr.value == true) {
+    if (win.gr.value === true) {
       executeMenuCommand('group');
     }
     win.close();
@@ -71,11 +76,11 @@
     var core = new Core(opts);
     if (previewFlag) {
       core.clearPrevious(duplicates);
-      duplicates = core.main();
+      duplicates = core.duplicate();
       win.update();
       redraw();
     } else {
-      duplicates = core.main();
+      duplicates = core.duplicate();
       win.update();
       redraw();
       previewFlag = true;
@@ -98,10 +103,11 @@
    * operating with varlues of the panel
    * and save settings on ini-file
    * path to save is relatively:
-   * * userData/LocalStorage/boxFingerJoints/boxFingerJoints.ini
+   * * userData/LocalStorage/duplicateItems/duplicateItems.ini
    *
    * @method{setFaceValues} load the values to interface from ini-file or from defaults object
-   * @method{
+   * @method{getFaceValues}
+   * @method{setIniValues}
    * @constructor
    *
    * */
@@ -134,7 +140,9 @@
         }
         if (key == "gr") {
           var boolValue = false;
-          values[key] == 'true' ? boolValue = true : "";
+          if (values[key] == 'true') {
+            boolValue = true;
+          }
           win[key].value = boolValue;
           continue;
         }
@@ -246,10 +254,11 @@
   }
 
   /**
-   * move objects
+   * move copyes of the object[s]
    *
    * @constructor
-   * @method {move}
+   * @method {duplicate}
+   * @method {clearPrevious}
    * */
   function Core(opts) {
 
@@ -277,27 +286,30 @@
         vStep = +opts.vStep,
         gr    = opts.gr;
 
-    this.main          = function() {
+    this.duplicate = function() {
       var dupls     = [];
-      var duplsHor  = moveHoriz(hVal, hStep);
-      var duplsVert = moveVert(vVal, vStep);
+      var duplsHor  = _moveHoriz(hVal, hStep);
+      var duplsVert = _moveVert(vVal, vStep);
 
       return dupls.concat(duplsHor, duplsVert);
     }
-    this.clearPrevious = function(arr) {
-      for (var i = arr.length - 1; i >= 0; i--) {
-        var item = arr[i];
+
+    this.clearPrevious = function(previousItems) {
+      for (var i = previousItems.length - 1; i >= 0; i--) {
+        var item = previousItems[i];
         item.remove();
       }
     }
 
-    function moveHoriz(hVal, hStep) {
+    function _moveHoriz(hVal, hStep) {
       var sel   = selection;
       var dupls = [];
+
       if (hStep === 0) return dupls;
 
       for (var i = 0; i < sel.length; i++) {
         var currSel = sel[i];
+
         for (var j = 0; j < hStep; j++) {
           var dupl      = currSel.duplicate();
           dupl.position = [dupl.position[0] + hVal, dupl.position[1]];
@@ -308,13 +320,15 @@
       return dupls;
     }
 
-    function moveVert(vVal, vStep) {
+    function _moveVert(vVal, vStep) {
       var sel   = selection;
       var dupls = [];
+
       if (vStep === 0) return dupls;
 
       for (var i = 0; i < sel.length; i++) {
         var currSel = sel[i];
+
         for (var j = 0; j < vStep; j++) {
           var dupl      = currSel.duplicate();
           dupl.position = [dupl.position[0], dupl.position[1] - vVal];
@@ -327,4 +341,3 @@
 
   }
 }() );
-
