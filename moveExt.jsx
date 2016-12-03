@@ -7,6 +7,10 @@
 //@target illustrator
 
 (function moveExtend() {
+  if (!selection.length) {
+    throw new Error('No selection');
+    return;
+  }
 
   var store       = new Store('moveExtend');
   var previewFlag = false;
@@ -53,7 +57,7 @@
     if (!previewFlag) {
       var opts = store.getFaceValues(win);
       var core = new Core(opts);
-      core.makeBox();
+      core.main();
     }
     win.close();
   }
@@ -63,11 +67,11 @@
     var core = new Core(opts);
     if (previewFlag) {
       undo();
-      core.makeBox();
+      core.main();
       win.update();
       redraw();
     } else {
-      core.makeBox();
+      core.main();
       win.update();
       redraw();
       previewFlag = true;
@@ -262,11 +266,43 @@
 
     var hVal  = +opts.hVal * unitsFactor,
         vVal  = +opts.vVal * unitsFactor,
-        hStep = +opts.hStep * unitsFactor,
-        vStep = +opts.vStep * unitsFactor,
-        gr    = opts.gr,
+        hStep = +opts.hStep,
+        vStep = +opts.vStep,
+        gr    = opts.gr;
 
-        lay   = selection[0].layer;
+    this.main = function() {
+      moveHoriz(hVal, hStep, selection);
+      moveVert(vVal, vStep, selection);
+    }
+
+    function moveHoriz(hVal, hStep, sel) {
+      if (hStep === 0) return;
+
+      // first horizontal
+      for (var s = 0; s < sel.length; s++) {
+        var currSel = sel[s];
+        for (var h = 0; h < hStep; h++) {
+          var dupl      = currSel.duplicate();
+          dupl.position = [dupl.position[0] + hVal, dupl.position[1]];
+          currSel       = dupl;
+        }
+      }
+    }
+
+    function moveVert(vVal, vStep, sel) {
+      if (vStep === 0) return;
+
+      // first horizontal
+      for (var s = 0; s < sel.length; s++) {
+        var currSel = sel[s];
+        for (var h = 0; h < vStep; h++) {
+          var dupl      = currSel.duplicate();
+          dupl.position = [dupl.position[0], dupl.position[1] - vVal];
+          currSel       = dupl;
+        }
+      }
+    }
+
   }
 }() );
 
