@@ -14,6 +14,7 @@
 
   var store       = new Store('moveExtend');
   var previewFlag = false;
+  var duplicates  = [];
 
   var win = new Window('dialog', 'Move Extend');
   var pan = win.add('panel', undefined, 'Move parameters');
@@ -59,6 +60,9 @@
       var core = new Core(opts);
       core.main();
     }
+    if (win.gr.value == true) {
+      executeMenuCommand('group');
+    }
     win.close();
   }
 
@@ -66,12 +70,12 @@
     var opts = store.getFaceValues(win);
     var core = new Core(opts);
     if (previewFlag) {
-      undo();
-      core.main();
+      core.clearPrevious(duplicates);
+      duplicates = core.main();
       win.update();
       redraw();
     } else {
-      core.main();
+      duplicates = core.main();
       win.update();
       redraw();
       previewFlag = true;
@@ -80,7 +84,10 @@
 
   cancelBtn.onClick = function() {
     if (previewFlag) {
-      undo();
+      for (var i = duplicates.length - 1; i >= 0; i--) {
+        var item = duplicates[i];
+        item.remove();
+      }
     }
     win.close();
   }
@@ -270,37 +277,52 @@
         vStep = +opts.vStep,
         gr    = opts.gr;
 
-    this.main = function() {
-      moveHoriz(hVal, hStep, selection);
-      moveVert(vVal, vStep, selection);
+    this.main          = function() {
+      var dupls     = [];
+      var duplsHor  = moveHoriz(hVal, hStep);
+      var duplsVert = moveVert(vVal, vStep);
+
+      return dupls.concat(duplsHor, duplsVert);
+    }
+    this.clearPrevious = function(arr) {
+      for (var i = arr.length - 1; i >= 0; i--) {
+        var item = arr[i];
+        item.remove();
+      }
     }
 
-    function moveHoriz(hVal, hStep, sel) {
-      if (hStep === 0) return;
+    function moveHoriz(hVal, hStep) {
+      var sel   = selection;
+      var dupls = [];
+      if (hStep === 0) return dupls;
 
-      // first horizontal
-      for (var s = 0; s < sel.length; s++) {
-        var currSel = sel[s];
-        for (var h = 0; h < hStep; h++) {
+      for (var i = 0; i < sel.length; i++) {
+        var currSel = sel[i];
+        for (var j = 0; j < hStep; j++) {
           var dupl      = currSel.duplicate();
           dupl.position = [dupl.position[0] + hVal, dupl.position[1]];
           currSel       = dupl;
+          dupls.push(dupl);
         }
       }
+      return dupls;
     }
 
-    function moveVert(vVal, vStep, sel) {
-      if (vStep === 0) return;
+    function moveVert(vVal, vStep) {
+      var sel   = selection;
+      var dupls = [];
+      if (vStep === 0) return dupls;
 
-      // first horizontal
-      for (var s = 0; s < sel.length; s++) {
-        var currSel = sel[s];
-        for (var h = 0; h < vStep; h++) {
+      for (var i = 0; i < sel.length; i++) {
+        var currSel = sel[i];
+        for (var j = 0; j < vStep; j++) {
           var dupl      = currSel.duplicate();
           dupl.position = [dupl.position[0], dupl.position[1] - vVal];
           currSel       = dupl;
+          dupls.push(dupl);
         }
       }
+      return dupls;
     }
 
   }
