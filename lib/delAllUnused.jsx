@@ -1,5 +1,5 @@
 /**
- * ai.jsx (c)MaratShagiev m_js@bk.ru 04.08.2016.
+ * ai.jsx (c)MaratShagiev m_js@bk.ru 07-12-2016
  */
 
 (function act_delAllUnused() {
@@ -188,6 +188,7 @@
       '}'
   }
   runAction('delAllUnused', 'delAllUnused', str);
+  ungoupAllSwatchGroups();
   for (var i = 0; i < sel.length; i++) {
     var item     = sel[i];
     item.slected = true;
@@ -262,7 +263,6 @@
    * - rename duplicates
    *
    * */
-
   function ungoupAllSwatchGroups() {
     var d           = app.activeDocument;
     var swGrps      = d.swatchGroups;
@@ -273,7 +273,7 @@
       var swatches = obj.getAllSwatches();
       for (var j = 0; j < swatches.length; j++) {
         var sw = swatches[j];
-        swDuplNames.push(duplicateSwatch(j));
+        swDuplNames.push(duplicateSwatch(j, sw).name);
       }
     }
 
@@ -288,9 +288,9 @@
       swDupl.name    = swDupl.name.slice(0, -7);
     }
 
-    function duplicateSwatch(i) {
+    function duplicateSwatch(i, sw) {
 
-      var opts = getSpotOpts(activeDocument.swatches[6].color.spot);
+      var opts = getSpotOpts(sw.color.spot);
       return addSw(opts, i);
 
       function addSw(opts, i) {
