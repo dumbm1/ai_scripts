@@ -256,6 +256,73 @@
     return sel;
   }
 
+function ungrSw() {
 
+var opts = getSpotOpts(activeDocument.swatches[6].color.spot);
+addSw(opts, 0);
+
+function addSw(opts, i) {
+  var d            = app.activeDocument,
+      newSpot      = d.spots.add(),
+      newSpotColor = new SpotColor(),
+      newColor;
+
+  switch (opts.spotKind) {
+    case 'SpotColorKind.SPOTCMYK':
+      newColor = addNewCMYK();
+      break;
+    case 'SpotColorKind.SPOTLAB':
+      newColor = addNewLab();
+      break;
+    case 'SpotColorKind.SPOTRGB':
+      newColor = addNewRGB();
+      break;
+    default:
+      break;
+  }
+
+  newSpot.name      = opts.name + ' copy ' + i;
+  newSpot.colorType = opts.colorType;
+  newSpot.color     = newColor;
+
+  newSpotColor.spot = newSpot;
+}
+
+function getSpotOpts(spotSwatch) {
+  var opts = {
+    color:     spotSwatch.color,
+    colorType: spotSwatch.colorType,
+    name:      spotSwatch.name,
+    spotKind:  spotSwatch.spotKind,
+    spotComps: spotSwatch.getInternalColor()
+  }
+  return opts;
+}
+
+function addNewLab() {
+  var newLab = new LabColor();
+  newLab.l   = opts.spotComps[0];
+  newLab.a   = opts.spotComps[1];
+  newLab.b   = opts.spotComps[2];
+  return newLab
+}
+
+function addNewRGB() {
+  var newLab = new RGBColor();
+  newLab.l   = opts.spotComps[0];
+  newLab.a   = opts.spotComps[1];
+  newLab.b   = opts.spotComps[2];
+  return newLab
+}
+
+function addNewCMYK() {
+  var newCMYK     = new CMYKColor();
+  newCMYK.cyan    = opts.spotComps[0];
+  newCMYK.magenta = opts.spotComps[1];
+  newCMYK.yellow  = opts.spotComps[2];
+  newCMYK.black   = opts.spotComps[3];
+  return newLab
+}
+}
 
 }());
