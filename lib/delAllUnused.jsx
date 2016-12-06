@@ -188,7 +188,7 @@
       '}'
   }
   runAction('delAllUnused', 'delAllUnused', str);
-  ungoupAllSwatchGroups();
+
   for (var i = 0; i < sel.length; i++) {
     var item     = sel[i];
     item.slected = true;
@@ -256,108 +256,4 @@
 
     return sel;
   }
-  /**
-   * algorithm:
-   * - duplicate swatches from groups
-   * - remove groups
-   * - rename duplicates
-   *
-   * */
-  function ungoupAllSwatchGroups() {
-    var d           = app.activeDocument;
-    var swGrps      = d.swatchGroups;
-    var swDuplNames = [];
-
-    for (var i = 1; i < swGrps.length; i++) {
-      var obj      = swGrps[i];
-      var swatches = obj.getAllSwatches();
-      for (var j = 0; j < swatches.length; j++) {
-        var sw = swatches[j];
-        swDuplNames.push(duplicateSwatch(j, sw).name);
-      }
-    }
-
-    for (var k = swGrps.length - 1; k >= 1; k--) {
-      var swGr = swGrps[k];
-      swGr.remove();
-    }
-
-    for (var l = 0; l < swDuplNames.length; l++) {
-      var swDuplName = swDuplNames[l];
-      var swDupl     = d.swatches.getByName(swDuplName);
-      swDupl.name    = swDupl.name.slice(0, -7);
-    }
-
-    function duplicateSwatch(i, sw) {
-
-      var opts = getSpotOpts(sw.color.spot);
-      return addSw(opts, i);
-
-      function addSw(opts, i) {
-
-        var newSpot      = d.spots.add(),
-            newSpotColor = new SpotColor(),
-            newColor;
-
-        switch (opts.spotKind) {
-          case SpotColorKind.SPOTCMYK:
-            newColor = addNewCMYK(opts);
-            break;
-          case SpotColorKind.SPOTLAB:
-            newColor = addNewLab(opts);
-            break;
-          case SpotColorKind.SPOTRGB:
-            newColor = addNewRGB(opts);
-            break;
-          default:
-            throw new Error('opts.spotKind error');
-            break;
-        }
-
-        newSpot.name      = opts.name + ' copy ' + i;
-        newSpot.colorType = opts.colorType;
-        newSpot.color     = newColor;
-
-        newSpotColor.spot = newSpot;
-        return newSpot;
-      }
-
-      function getSpotOpts(spotSwatch) {
-        var opts = {
-          color:     spotSwatch.color,
-          colorType: spotSwatch.colorType,
-          name:      spotSwatch.name,
-          spotKind:  spotSwatch.spotKind,
-          spotComps: spotSwatch.getInternalColor()
-        }
-        return opts;
-      }
-
-      function addNewLab(opts) {
-        var newLab = new LabColor();
-        newLab.l   = opts.spotComps[0];
-        newLab.a   = opts.spotComps[1];
-        newLab.b   = opts.spotComps[2];
-        return newLab;
-      }
-
-      function addNewRGB(opts) {
-        var newRGB   = new RGBColor();
-        newRGB.red   = opts.spotComps[0];
-        newRGB.green = opts.spotComps[1];
-        newRGB.blue  = opts.spotComps[2];
-        return newRGB;
-      }
-
-      function addNewCMYK(opts) {
-        var newCMYK     = new CMYKColor();
-        newCMYK.cyan    = opts.spotComps[0];
-        newCMYK.magenta = opts.spotComps[1];
-        newCMYK.yellow  = opts.spotComps[2];
-        newCMYK.black   = opts.spotComps[3];
-        return newCMYK;
-      }
-    }
-  }
-
 }());
