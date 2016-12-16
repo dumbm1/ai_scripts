@@ -256,4 +256,31 @@
 
     return sel;
   }
+
+  function addCmykSw(swName, values) {
+    if (!documents.length) throw new Error('Expected document');
+    if (arguments.length < 2) throw new Error('Expected two arguments');
+    if (!values.splice) throw new Error('Second argument expected an array');
+    if (typeof swName != 'string' && swName.constructor != 'String') throw new Error('First argument expected a string');
+    var d = activeDocument;
+    try {
+      d.swatches.getByName(swName);
+      return;
+    } catch (e) {
+      if (e.message == 'No such element') {
+        var sw        = d.swatches.add();
+        sw.name       = swName;
+        var swCol     = new CMYKColor();
+        swCol.cyan    = values[0];
+        swCol.magenta = values[1];
+        swCol.yellow  = values[2];
+        swCol.black   = values[3];
+        sw.color      = swCol;
+        return sw;
+      } else {
+        alert(e);
+        return;
+      }
+    }
+  }
 }());
