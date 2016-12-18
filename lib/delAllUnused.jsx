@@ -1,8 +1,14 @@
 /**
- * ai.jsx (c)MaratShagiev m_js@bk.ru 07-12-2016
- */
+ * Adobe ExtendScript for Illustrator CS6+
+ * (c)Marat Shagiev
+ * m_js@bk.ru
+ * 19.12.2016
+ * */
+
+//@target illustrator
 
 (function act_delAllUnused() {
+
   var sel = deselAllSw(activeDocument);
   delNoSpotSwatches();
 
@@ -194,8 +200,29 @@
     item.slected = true;
   }
 
+  var cmyko = {
+    "White":        [0, 0, 0, 0],
+    "Black":        [0, 0, 0, 100],
+    "CMYK Cyan":    [100, 0, 0, 0],
+    "CMYK Magenta": [0, 100, 0, 0],
+    "CMYK Yellow":  [0, 0, 100, 0]
+  }
+
+  for (var key in cmyko) {
+    try {
+      activeDocument.swatches.getByName(key);
+      continue;
+    } catch (e) {
+      if (e.message == 'No such element') {
+        addCmykSw(key, cmyko[key]);
+      }
+    }
+
+  }
+
+  if (activeDocument.swatchGroups.length > 1) ungrSw();
+
   /**
-   * todo: add ungroup swatchGroups
    * Delete all swatches except Swatche.color.colorType == ColorModel.SPOT
    * Delete all SwatchGroups except base
    * */
@@ -203,16 +230,23 @@
     var doc = activeDocument;
     for (var i = doc.swatches.length - 1; i >= 0; i--) {
       var sw = doc.swatches[i];
+
+      if (sw.name == 'CMYK Cyan' && sw.color.typename == 'CMYKColor') continue;
+      if (sw.name == 'CMYK Magenta' && sw.color.typename == 'CMYKColor') continue;
+      if (sw.name == 'CMYK Yellow' && sw.color.typename == 'CMYKColor') continue;
+      if (sw.name == 'White' && sw.color.typename == 'CMYKColor') continue;
+      if (sw.name == 'Black' && sw.color.typename == 'CMYKColor') continue;
+
       if (sw.color.typename == 'SpotColor') {
         if (sw.color.spot.colorType == ColorModel.SPOT) continue;
       }
       sw.remove();
     }
-    for (var j = doc.swatchGroups.length - 1; j > 0; j--) {
-      var swGr = doc.swatchGroups[j];
-      if (swGr.getAllSwatches().length) continue;
-      swGr.remove();
-    }
+    /*    for (var j = doc.swatchGroups.length - 1; j > 0; j--) {
+     var swGr = doc.swatchGroups[j];
+     if (swGr.getAllSwatches().length) continue;
+     swGr.remove();
+     }*/
   }
 
   function runAction(actName, setName, actStr) {
@@ -281,6 +315,33 @@
         alert(e);
         return;
       }
+    }
+  }
+
+  /**
+   * ungroup all swatchGroups
+   * main algorithm:
+   * * cut() items layer by layer to another temporary document
+   * * delete swatchGroups
+   * * back items to original document with executeMenuCommand('pastInPlace')
+   * */
+  function ungrSw() {
+    var d        = activeDocument;
+    var swGrps   = d.swatchGroups;
+    var mainSwGr = d.swatchGroups[0];
+
+    for (var i = 1; i < swGrps.length; i++) {
+      var swGr    = swGrps[i];
+      var swGrSws = swGr.getAllSwatches();
+      for (var j = 0; j < swGrSws.length; j++) {
+        var sw = swGrSws[j];
+        mainSwGr.addSwatch(sw);
+      }
+    }
+
+    for (var k = swGrps.length - 1; k > 0; k--) {
+      var obj = swGrps[k];
+      obj.remove();
     }
   }
 }());
