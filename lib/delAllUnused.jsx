@@ -9,11 +9,127 @@
 
 (function act_delAllUnused() {
 
-  var sel = deselAllSw(activeDocument);
+  var str = getStrForRmUnusedAct();
   delNoSpotSwatches();
+  runAction('delAllUnused', 'delAllUnused', str);
+  addCmykw();
+  ungrSw();
 
-  {
-    var str = '/version 3' +
+  function addCmykw() {
+    var cmyko = {
+      "White":        [0, 0, 0, 0],
+      "Black":        [0, 0, 0, 100],
+      "CMYK Cyan":    [100, 0, 0, 0],
+      "CMYK Magenta": [0, 100, 0, 0],
+      "CMYK Yellow":  [0, 0, 100, 0]
+    }
+    for (var key in cmyko) {
+      try {
+        activeDocument.swatches.getByName(key);
+        continue;
+      } catch (e) {
+        if (e.message == 'No such element') {
+          _addCmykSw(key, cmyko[key]);
+        }
+      }
+    }
+
+    function _addCmykSw(swName, values) {
+      if (!documents.length) throw new Error('Expected document');
+      if (arguments.length < 2) throw new Error('Expected two arguments');
+      if (!values.splice) throw new Error('Second argument expected an array');
+      if (typeof swName != 'string' && swName.constructor != 'String') throw new Error('First argument expected a string');
+
+      var d = activeDocument;
+
+      try {
+        d.swatches.getByName(swName);
+        return;
+      } catch (e) {
+        if (e.message == 'No such element') {
+          var sw = d.swatches.add();
+          sw.name       = swName;
+          var swCol     = new CMYKColor();
+          swCol.cyan    = values[0];
+          swCol.magenta = values[1];
+          swCol.yellow  = values[2];
+          swCol.black   = values[3];
+          sw.color      = swCol;
+          return sw;
+        } else {
+          alert(e);
+          return;
+        }
+      }
+    }
+  }
+
+  /**
+   * Delete all swatches except Swatche.color.colorType == ColorModel.SPOT
+   * Delete all SwatchGroups except base
+   * */
+  function delNoSpotSwatches() {
+    var doc = activeDocument;
+    for (var i = doc.swatches.length - 1; i >= 0; i--) {
+      var sw = doc.swatches[i];
+
+      /*   if (sw.color.typename == 'CMYKColor') {
+       if (sw.name == 'CMYK Cyan') continue;
+       if (sw.name == 'CMYK Magenta') continue;
+       if (sw.name == 'CMYK Yellow') continue;
+       if (sw.name == 'White') continue;
+       if (sw.name == 'Black') continue;
+       }*/
+
+      if (sw.color.typename == 'GradientColor') continue;
+      if (sw.color.typename == 'PatternColor') continue;
+
+      if (sw.color.typename == 'SpotColor') {
+        if (sw.color.spot.colorType == ColorModel.SPOT) continue;
+      }
+
+      sw.remove();
+    }
+  }
+
+  function runAction(actName, setName, actStr) {
+    var f = new File('~/ScriptAction.aia');
+    f.open('w');
+    f.write(actStr);
+    f.close();
+    app.loadAction(f);
+    f.remove();
+    app.doScript(actName, setName, false); // action name, set name
+    app.unloadAction(setName, ""); // set name
+  }
+
+  /**
+   * ungroup all swatchGroups
+   * */
+  function ungrSw() {
+    if (activeDocument.swatchGroups.length < 1) return;
+
+    var d        = activeDocument;
+    var swGrps   = d.swatchGroups;
+    var mainSwGr = d.swatchGroups[0];
+
+    for (var i = 1; i < swGrps.length; i++) { // move swatches to base group
+      var swGr    = swGrps[i];
+      var swGrSws = swGr.getAllSwatches();
+      for (var j = 0; j < swGrSws.length; j++) {
+        var sw = swGrSws[j];
+        mainSwGr.addSwatch(sw);
+      }
+    }
+
+    for (var k = swGrps.length - 1; k > 0; k--) { // remove empty groups
+      var obj = swGrps[k];
+      obj.remove();
+    }
+  }
+
+  function getStrForRmUnusedAct() {
+    return '/version 3' +
       '/name [ 12' +
       '	64656c416c6c556e75736564' +
       ']' +
@@ -192,156 +308,6 @@
       '		}' +
       '	}' +
       '}'
-  }
-  runAction('delAllUnused', 'delAllUnused', str);
 
-  for (var i = 0; i < sel.length; i++) {
-    var item     = sel[i];
-    item.slected = true;
-  }
-
-  var cmyko = {
-    "White":        [0, 0, 0, 0],
-    "Black":        [0, 0, 0, 100],
-    "CMYK Cyan":    [100, 0, 0, 0],
-    "CMYK Magenta": [0, 100, 0, 0],
-    "CMYK Yellow":  [0, 0, 100, 0]
-  }
-
-  for (var key in cmyko) {
-    try {
-      activeDocument.swatches.getByName(key);
-      continue;
-    } catch (e) {
-      if (e.message == 'No such element') {
-        addCmykSw(key, cmyko[key]);
-      }
-    }
-
-  }
-
-  if (activeDocument.swatchGroups.length > 1) ungrSw();
-
-  /**
-   * Delete all swatches except Swatche.color.colorType == ColorModel.SPOT
-   * Delete all SwatchGroups except base
-   * */
-  function delNoSpotSwatches() {
-    var doc = activeDocument;
-    for (var i = doc.swatches.length - 1; i >= 0; i--) {
-      var sw = doc.swatches[i];
-
-      if (sw.name == 'CMYK Cyan' && sw.color.typename == 'CMYKColor') continue;
-      if (sw.name == 'CMYK Magenta' && sw.color.typename == 'CMYKColor') continue;
-      if (sw.name == 'CMYK Yellow' && sw.color.typename == 'CMYKColor') continue;
-      if (sw.name == 'White' && sw.color.typename == 'CMYKColor') continue;
-      if (sw.name == 'Black' && sw.color.typename == 'CMYKColor') continue;
-
-      if (sw.color.typename == 'SpotColor') {
-        if (sw.color.spot.colorType == ColorModel.SPOT) continue;
-      }
-      sw.remove();
-    }
-    /*    for (var j = doc.swatchGroups.length - 1; j > 0; j--) {
-     var swGr = doc.swatchGroups[j];
-     if (swGr.getAllSwatches().length) continue;
-     swGr.remove();
-     }*/
-  }
-
-  function runAction(actName, setName, actStr) {
-    var f = new File('~/ScriptAction.aia');
-    f.open('w');
-    f.write(actStr);
-    f.close();
-    app.loadAction(f);
-    f.remove();
-    app.doScript(actName, setName, false); // action name, set name
-    app.unloadAction(setName, ""); // set name
-  }
-
-  /**
-   * deselect all selected PageItems, Swatches and SwatchGroups
-   * across creating new temp path and new temp swatch
-   *
-   * @param {Document} doc - Object of Illustrator DOM Document class
-   * @return {Array} sel - the objects that were selected before the script starts
-   * */
-  function deselAllSw(doc) {
-    var sel = selection;
-
-    var tmpSw  = doc.swatches.add(),
-        swCol  = new CMYKColor(),
-        tmpPth = doc.activeLayer.pathItems.rectangle(0, 0, 100, 100);
-
-    executeMenuCommand('deselectall');
-
-    tmpSw.name       = '__temp_swatch_to_delete_xyz__';
-    swCol.cyan       = 30;
-    swCol.yellow     = 100;
-    swCol.black      = 0;
-    swCol.magenta    = 0;
-    tmpSw.color      = swCol;
-    tmpPth.stroked   = false;
-    tmpPth.fillColor = tmpSw.color;
-    tmpPth.selected  = true;
-    tmpPth.remove();
-    tmpSw.remove();
-
-    return sel;
-  }
-
-  function addCmykSw(swName, values) {
-    if (!documents.length) throw new Error('Expected document');
-    if (arguments.length < 2) throw new Error('Expected two arguments');
-    if (!values.splice) throw new Error('Second argument expected an array');
-    if (typeof swName != 'string' && swName.constructor != 'String') throw new Error('First argument expected a string');
-    var d = activeDocument;
-    try {
-      d.swatches.getByName(swName);
-      return;
-    } catch (e) {
-      if (e.message == 'No such element') {
-        var sw        = d.swatches.add();
-        sw.name       = swName;
-        var swCol     = new CMYKColor();
-        swCol.cyan    = values[0];
-        swCol.magenta = values[1];
-        swCol.yellow  = values[2];
-        swCol.black   = values[3];
-        sw.color      = swCol;
-        return sw;
-      } else {
-        alert(e);
-        return;
-      }
-    }
-  }
-
-  /**
-   * ungroup all swatchGroups
-   * main algorithm:
-   * * cut() items layer by layer to another temporary document
-   * * delete swatchGroups
-   * * back items to original document with executeMenuCommand('pastInPlace')
-   * */
-  function ungrSw() {
-    var d        = activeDocument;
-    var swGrps   = d.swatchGroups;
-    var mainSwGr = d.swatchGroups[0];
-
-    for (var i = 1; i < swGrps.length; i++) {
-      var swGr    = swGrps[i];
-      var swGrSws = swGr.getAllSwatches();
-      for (var j = 0; j < swGrSws.length; j++) {
-        var sw = swGrSws[j];
-        mainSwGr.addSwatch(sw);
-      }
-    }
-
-    for (var k = swGrps.length - 1; k > 0; k--) {
-      var obj = swGrps[k];
-      obj.remove();
-    }
   }
 }());
