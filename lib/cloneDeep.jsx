@@ -7,24 +7,26 @@
 
 //@target illustrator
 
-Array.prototype.clone = function() {
-
-  return cloneDeep(this);
-
-  function cloneDeep(obj) {
+/**
+ * Deep clone of array
+ * */
+Array.prototype.cloneDeep = function() {
+  return _cloneDeep(this);
+  function _cloneDeep(obj) {
     if (typeof obj == 'object') {
+      var r;
       if (isArray(obj)) {
         var l = obj.length;
-        var r = new Array(l);
+        r     = new Array(l);
         for (var i = 0; i < l; i++) {
-          r[i] = cloneDeep(obj[i]);
+          r[i] = _cloneDeep(obj[i]);
         }
         return r;
       } else {
-        var r       = {};
+        r           = {};
         r.prototype = obj.prototype;
         for (var k in obj) {
-          r[k] = cloneDeep(obj[k]);
+          r[k] = _cloneDeep(obj[k]);
         }
         return r;
       }
