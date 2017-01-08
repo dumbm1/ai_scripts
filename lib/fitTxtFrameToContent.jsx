@@ -17,7 +17,7 @@
  - JSX scripts should use anonymous functions and local vars only whenever possible, as AI's shared JS interpreter gets increasingly fragile as globals are defined, eventually resulting in JS (and AS!) commands repeatedly failing with PARM ('MRAP') errors until AI is relaunched. (Though even this doesn't necessarily avoid problem; e.g. repeatedly running any JS script from AS seems to blow up after a while, after which AS commands randomly fail as well.)
  */
 
-(function() {
+function fitTxtFrameToContent() {
 
   for (var i = 0; i < activeDocument.selection.length; i++) {
     fitFrame(activeDocument.selection[i]);
@@ -80,5 +80,5 @@
     }
     return textPath.height;
   }
-})();
+}
  

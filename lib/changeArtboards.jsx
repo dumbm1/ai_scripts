@@ -2,11 +2,9 @@
  * .jsx for Adobe apps. Marat Shagiev. Date: 02.09.2014, Time: 19:29
  */
 
-changeArtboards();
-
 function changeArtboards() {
-  var PT_TO_MM = 2.834645668; 
-  var doc = function () {
+  var PT_TO_MM = 2.834645668;
+  var doc      = function() {
     return activeDocument;
   }();
 

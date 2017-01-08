@@ -1,4 +1,8 @@
-﻿//@target illustrator-21
+﻿/**
+ * 30-11-2016
+ * */
+
+//@target illustrator-21
 getMaxCollectionBnds(activeDocument.pathItems, 'geometricBounds');
 /**
  * get maximum bounds of the collection of the elements or one element

@@ -1,6 +1,18 @@
 /**
  * jsx for Ai. Marat Shagiev: marat_js@bk.ru. 26.01.2015
+ *
+ * todo: does not work in cc2017 exact
  */
+
+// check
+//var f = new File ( activeDocument.fullName );
+//alert ( f.exists )
+//alert ( f.fullName );
+//alert ( _isAiFile ( f ) || _isEpsFile ( f ) );
+//alert ( !_isAiFile ( f ) && !_isEpsFile ( f ) );
+//alert ( f.extension () );
+//alert ( f.noExtension () );
+//alert ( f.displayName );
 
 Folder.prototype.extension = function () {
   return undefined;
@@ -26,13 +38,5 @@ function _isEpsFile ( obj ) {
   return obj.constructor.name === 'File' && !obj.hidden && obj.extension () == "eps";
 }
 
-// разные проверки
-//var f = new File ( activeDocument.fullName );
-//alert ( f.exists )
-//alert ( f.fullName );
-//alert ( _isAiFile ( f ) || _isEpsFile ( f ) );
-//alert ( !_isAiFile ( f ) && !_isEpsFile ( f ) );
-//alert ( f.extension () );
-//alert ( f.noExtension () );
-//alert ( f.displayName );
+
 

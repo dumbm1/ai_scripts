@@ -1,5 +1,7 @@
 /**
- * ai.jsx (c)MaratShagiev m_js@bk.ru 19.12.2015.
+ * ai.jsx (c)MaratShagiev m_js@bk.ru 19.12.2015
+ *
+ * demo
  */
 
 var folder = new Folder ('');
