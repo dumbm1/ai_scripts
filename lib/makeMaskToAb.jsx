@@ -1,20 +1,11 @@
 /**
- * jsx for Ai. Marat Shagiev: marat_js@bk.ru. 12.01.2015
- */
+ * Adobe ExtendScript for Illustrator
+ * (c) Marat Shagiev
+ * e-mail: m_js@bk.ru
+ * 02.02.2017
+ * */
 
-var artRect = makeRectToArtb();
-
-/*function makeRectToArtb() {
-
- activeDocument.rulerOrigin = [0, activeDocument.height];
-
- var artbWidth  = activeDocument.width,
- artbHeight = activeDocument.height;
-
- return activeDocument.activeLayer.pathItems.rectangle(0, 0, artbWidth, artbHeight);
- }*/
-
-function makeRectToAb() {
+function makeMaskToAb() {
   var d        = activeDocument,
       abs      = d.artboards,
       abIndex  = abs.getActiveArtboardIndex(),
@@ -24,6 +15,10 @@ function makeRectToAb() {
       abH      = Math.abs(abRect[1] - abRect[3]),
 
       rectToAb = d.pathItems.rectangle(abRect[1], abRect[0], abW, abH);
+
+  d.selectObjectsOnActiveArtboard();
+  // executeMenuCommand('group');
+  executeMenuCommand('makeMask');
 
   return rectToAb;
 }
