@@ -1,0 +1,77 @@
+/**
+ * Adobe ExtendScript for Illustrator
+ * (c)Marat Shagiev
+ * m_js@bk.ru
+ * 03.02.2017
+ * */
+
+//@target illustrator
+
+function act_cmykToRgb() {
+
+  {
+    var actStr = '' +
+      '/version 3'+
+      '/name [ 9'+
+      '	636d796b546f526762'+
+      ']'+
+      '/isOpen 1'+
+      '/actionCount 1'+
+      '/action-1 {'+
+      '	/name [ 9'+
+      '		636d796b546f526762'+
+      '	]'+
+      '	/keyIndex 0'+
+      '	/colorIndex 0'+
+      '	/isOpen 1'+
+      '	/eventCount 1'+
+      '	/event-1 {'+
+      '		/useRulersIn1stQuadrant 0'+
+      '		/internalName (adobe_commandManager)'+
+      '		/localizedName [ 16'+
+      '			416363657373204d656e75204974656d'+
+      '		]'+
+      '		/isOpen 0'+
+      '		/isOn 1'+
+      '		/hasDialog 0'+
+      '		/parameterCount 3'+
+      '		/parameter-1 {'+
+      '			/key 1769238125'+
+      '			/showInPalette -1'+
+      '			/type (ustring)'+
+      '			/value [ 13'+
+      '				646f632d636f6c6f722d726762'+
+      '			]'+
+      '		}'+
+      '		/parameter-2 {'+
+      '			/key 1818455661'+
+      '			/showInPalette -1'+
+      '			/type (ustring)'+
+      '			/value [ 30'+
+      '				446f63756d656e7420436f6c6f72204d6f64653a2052474220436f6c6f72'+
+      '			]'+
+      '		}'+
+      '		/parameter-3 {'+
+      '			/key 1668114788'+
+      '			/showInPalette -1'+
+      '			/type (integer)'+
+      '			/value 224'+
+      '		}'+
+      '	}'+
+      '}'
+  }
+
+  var f = new File('~/ScriptAction.aia');
+  f.open('w');
+  f.write(actStr);
+  f.close();
+  app.loadAction(f);
+  f.remove();
+
+  app.doScript("cmykToRgb", "cmykToRgb", false); // action name, set name
+  app.unloadAction("cmykToRgb", ""); // set name
+}
+
+
+
+ 
