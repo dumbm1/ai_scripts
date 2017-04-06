@@ -25,6 +25,8 @@
   }
 
   function _splitTxt (fr) {
+    __delSpaceBeforeEnter(fr);
+
     var result,
         resultFrames   = [],
         prevSectionLen = 0,
@@ -95,6 +97,23 @@
           currMatch.remove ();
         }
       } catch (e) {
+      }
+    }
+
+    function __delSpaceBeforeEnter (fr) {
+      var re       = / +$/gmi;
+      var replacer = '\r';
+
+      while (result = re.exec (fr.contents)) {
+        try {
+          var currMatch      = fr.characters[result.index];
+          currMatch.length   = result[0].length;
+          // currMatch.contents = currMatch.contents.replace (re, replacer);
+          currMatch.contents = replacer;
+          // !!! when the match.length is different with the replacer.length the loop becomes infinite
+          // re.lastIndex += currMatch.contents.length - result[0].length;
+        } catch (e) {
+        }
       }
     }
 
