@@ -177,7 +177,7 @@ function Dialog () {
     w.pathTxt.minimumSize.width = 300;
     w.pathTxt.maximumSize.width = 380;
     w.setsPanel.orientation = 'column';
-    w.setsPanel.maximumSize.height = 750 /*720*/;
+    w.setsPanel.maximumSize.height = 950 /*720*/;
     w.setsPanel.alignChildren = 'fill';
     w.chConfirm.value = false;
     w.chDirNearFile.value = false;
@@ -251,7 +251,7 @@ function Dialog () {
 
     o.optsGroups.orientation = 'column';
     o.optsGroups.alignChildren = 'left';
-    o.laysList.maximumSize.height = 128;
+    o.laysList.maximumSize.height = 200;
     // o.lays.maximumSize.width = 85;
     o.activateCheck.value = true;
     o.resVal.selection = 1;
