@@ -281,6 +281,9 @@ function moveExtend () {
      * */
     function makeup ( hVal, vVal, hCount, vCount, priority, hGr, vGr ) {
 
+      hVal = hVal.replace(',', '.');
+      vVal = vVal.replace(',', '.');
+
       hVal = hVal || 0;
       vVal = vVal || 0;
       hCount = hCount || 0;
