@@ -2,68 +2,7 @@
 expToJpg();
 function expToJpg() {
 
-  var newDateFrame = (function redate() {
-    var txtFrameDateName = '__current_date_and_time__',
-        txtFrameDate,
-        now              = new Date(),
-        strDate          = 'Дата:\n' + _formatDate(now) + '\nВремя:\n' + _formatTime(now),
-        lay              = activeDocument.activeLayer,
-        artb             = ( activeDocument.artboards[activeDocument.artboards.getActiveArtboardIndex()] ).artboardRect,
-        pos              = [artb[0], artb[1]];
-
-    try {
-      txtFrameDate = activeDocument.textFrames.getByName(txtFrameDateName);
-
-      if (txtFrameDate.contents != strDate) {
-        _setTxtAttributes(txtFrameDate);
-        txtFrameDate.contents = strDate;
-      }
-    } catch (e) {
-      // $.writeln( 'date/time frame error' );
-      if (+confirm('Make new date frame on active layer?')) {
-        txtFrameDate = lay.textFrames.add();
-        _setTxtAttributes(txtFrameDate);
-        txtFrameDate.contents = strDate;
-        txtFrameDate.name     = txtFrameDateName;
-        txtFrameDate.position = pos;
-        return true;
-      }
-    }
-
-    function _setTxtAttributes(txtFrame) {
-      //txtFrameDate.textRange.characterAttributes.size = 12;
-      txtFrameDate.textRange.paragraphAttributes.justification = Justification.CENTER;
-    }
-
-    function _formatTime(date) {
-
-      var hh = date.getHours();
-      if (hh < 10) hh = '0' + hh;
-
-      var mn = date.getMinutes();
-      if (mn < 10) mn = '0' + mn;
-
-      return hh + ':' + mn;
-    }
-
-    function _formatDate(date) {
-
-      var dd = date.getDate()
-      if (dd < 10) dd = '0' + dd;
-
-      var mm = date.getMonth() + 1
-      if (mm < 10) mm = '0' + mm;
-
-      var yy = date.getFullYear() % 100;
-      if (yy < 10) yy = '0' + yy;
-
-      return dd + '.' + mm + '.' + yy;
-    }
-  }());
-  if (newDateFrame) {
-    alert('Start export again');
-    return;
-  }
+  redate(true);
 
   /**============================>>
    * MAIN WINDOW *
@@ -130,9 +69,10 @@ function expToJpg() {
   function makeInterface() {
     var numbOfJpegs = promptNumb();
     //  alert(numbOfJpegs + ' ' + typeof numbOfJpegs); // todo: что то с обработчиками клавиш  esc и cancel
-    if (numbOfJpegs === null) {
+    if (numbOfJpegs == 0) {
       return;
     }
+
     mainWin.randStrArr = makeRandStrArr(numbOfJpegs);
     var exportOpts     = {};
     var dialObj        = new Dialog();
@@ -147,6 +87,8 @@ function expToJpg() {
     }
 
     dialWin.exportButt.onClick = function f() {
+      redate(false);
+
       makeDir(dialObj, 'jpg');
       var allowReplace = true;
 
@@ -183,8 +125,16 @@ function expToJpg() {
     if (numbOfJpegs == 0) {
       return;
     }
+
+    dialWin.closeButt.onClick = function f() {
+      if (numbOfJpegs == 0) {
+        return;
+      }
+      dialWin.close();
+    }
     // alert(numbOfJpegs);
     dialObj.showDialog(dialWin);
+
   }
 
   /**============================>>
@@ -243,9 +193,9 @@ function expToJpg() {
       w.chDirNearFile.value          = false;
       w.chSaveFile.value             = false;
 
-      w.closeButt.onClick     = function f() {
-        w.close();
-      }
+      /*w.closeButt.onClick     = function f() {
+       w.close();
+       }*/
       w.newDirButt.onClick    = function f() {
         mainWin.customDir     = self.folder.selectDlg();
         w.pathTxt.text        = mainWin.customDir.fsName;
@@ -361,6 +311,82 @@ function expToJpg() {
     }
     self.showDialog   = function f(w) {
       w.show();
+    }
+  }
+
+  function redate(makeNewDateFrame) {
+    var txtFrameDateName = '__current_date_and_time__',
+        txtFrameDate,
+        now              = new Date(),
+        strDate          = 'Дата:\n' + _formatDate(now) + '\nВремя:\n' + _formatTime(now),
+        lay              = activeDocument.activeLayer,
+        artb             = ( activeDocument.artboards[activeDocument.artboards.getActiveArtboardIndex()] ).artboardRect,
+        pos              = [artb[0], artb[1]];
+
+    if (!makeNewDateFrame) {
+      try {
+        txtFrameDate = activeDocument.textFrames.getByName(txtFrameDateName);
+        if (txtFrameDate.contents != strDate) {
+          _setTxtAttributes(txtFrameDate);
+          txtFrameDate.contents = strDate;
+        }
+      } catch (e) {
+        // $.writeln( 'date/time frame error' );
+        txtFrameDate = lay.textFrames.add();
+        _setTxtAttributes(txtFrameDate);
+        txtFrameDate.contents = strDate;
+        txtFrameDate.name     = txtFrameDateName;
+        txtFrameDate.position = pos;
+      }
+    } else {
+      try {
+        txtFrameDate = activeDocument.textFrames.getByName(txtFrameDateName);
+        if (txtFrameDate.contents != strDate) {
+          _setTxtAttributes(txtFrameDate);
+          txtFrameDate.contents = strDate;
+        }
+      } catch (e) {
+        // $.writeln( 'date/time frame error' );
+        if (+confirm('Make new date frame on active layer?')) {
+          txtFrameDate = lay.textFrames.add();
+          _setTxtAttributes(txtFrameDate);
+          txtFrameDate.contents = strDate;
+          txtFrameDate.name     = txtFrameDateName;
+          txtFrameDate.position = pos;
+          alert('Start export again');
+          return;
+        }
+      }
+    }
+
+    function _setTxtAttributes(txtFrame) {
+      //txtFrameDate.textRange.characterAttributes.size = 12;
+      txtFrameDate.textRange.paragraphAttributes.justification = Justification.CENTER;
+    }
+
+    function _formatTime(date) {
+
+      var hh = date.getHours();
+      if (hh < 10) hh = '0' + hh;
+
+      var mn = date.getMinutes();
+      if (mn < 10) mn = '0' + mn;
+
+      return hh + ':' + mn;
+    }
+
+    function _formatDate(date) {
+
+      var dd = date.getDate()
+      if (dd < 10) dd = '0' + dd;
+
+      var mm = date.getMonth() + 1
+      if (mm < 10) mm = '0' + mm;
+
+      var yy = date.getFullYear() % 100;
+      if (yy < 10) yy = '0' + yy;
+
+      return dd + '.' + mm + '.' + yy;
     }
   }
 
@@ -591,7 +617,7 @@ function expToJpg() {
     var statText      = opts.statText || 'Укажите количество jpeg-файлов';
     var editText      = opts.editText || 3;
     var editTextChars = opts.editTextCharacters || 3;
-    var maxVal        = opts.maxVal || 5;
+    var maxVal        = opts.maxVal || 6;
     var minVal        = opts.minVal || 1;
 
     var w                      = new Window('dialog', dialTitle, undefined, {closeButton: false});
@@ -615,17 +641,18 @@ function expToJpg() {
         w.editText.active = false;
         w.editText.active = true;
       }
-    })
+    });
     w.editText.addEventListener("keydown", function(k) {
       handle_key(k, this);
     });
     w.canselButt.addEventListener('click', function() {
       w.editText.text = 0;
+      return null;
     })
     w.canselButt.onClick = function() {
       w.editText.text = 0;
       w.close();
-      return 0;
+      return null;
     }
     w.addEventListener('keydown', function(k) {
       if (k.keyName == 'Enter') {
@@ -638,6 +665,7 @@ function expToJpg() {
       }
     })
     w.show();
+
     return +w.editText.text;
     // the hendler functions
     function handle_key(key, control) {
