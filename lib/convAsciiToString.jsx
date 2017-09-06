@@ -12,6 +12,7 @@ function convAnsiiToString(s) {
   var cod = '';
   for (var i = 0; i < s.length; i += 2) {
     cod = s.slice(i, i + 2);
+    if(cod == '00') continue;
     res += String.fromCharCode(parseInt(cod, 16));
   }
   return res;
