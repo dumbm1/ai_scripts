@@ -5,6 +5,8 @@
  * 06.09.2017
  * */
 // var pth = (activeDocument.fullName + '').slice(0, -3) + "jpg";
+// var pth = (new File(activeDocument.path + activeDocument.name).fsName).slice(0, -3) + ".jpg";
+var pth = File.encode((activeDocument.path + activeDocument.name).slice(0,-3) + ".jpg");
 
 {
   var actStr = "/version 3" +
@@ -49,10 +51,10 @@
     "			/showInPalette -1" +
     "			/type (ustring)" +
     "			/value [ 76" +
-    // pth +
-    "				443a5c405cd182d0b5d181d182d0bed0b2d18bd0b920d184d0b0d0b9d0bb20d1" +
-    "				8dd0bad181d0bfd0bed180d182d0b020373220d182d0bed187d0bad0b820d181" +
-    "				d0b5d180d18bd0b92e6a7067" +
+    strToAcsii( (File.encode((activeDocument.path + activeDocument.name + '').slice(0,-3) + ".jpg")).fsName ) +
+    // "				443a5c405cd182d0b5d181d182d0bed0b2d18bd0b920d184d0b0d0b9d0bb20d1" +
+    // "				8dd0bad181d0bfd0bed180d182d0b020373220d182d0bed187d0bad0b820d181" +
+    // "				d0b5d180d18bd0b92e6a7067" +
     "			]" +
     "		}" +
     "		/parameter-3 {" +
@@ -103,3 +105,11 @@ app.loadAction (f);
 f.remove ();
 app.doScript ("72gray", "72gray", false); // action name, set name
 app.unloadAction ("72gray", ""); // set name
+
+function strToAcsii(s) {
+  var res = '';
+  for(var i = 0; i < s.length; i++){
+    res += s.charCodeAt(i);
+  }
+  return res;
+}
