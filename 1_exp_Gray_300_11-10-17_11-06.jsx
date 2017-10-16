@@ -1,24 +1,32 @@
 //@target illustrator-19
 ;(function () {
-  var str     = ('' + activeDocument.fullName).slice(0, -3) + '.jpg'; // only exists .ai
+  var str = '';
+  try {
+    if (new File(activeDocument.fullName).exists) {
+      str = ('' + activeDocument.fullName).slice(0, -3) + '.jpg';
+    } else {
+      throw new Error("The file doesn't exists\nSave the file and try again");
+      return;
+    }
+  } catch (e) {
+    alert(e.message);
+  }
   var actStr1 = "/version 3" + "/name [ 5" + " 5365742032" + "]" + "/isOpen 1" + "/actionCount 1" + "/action-1 {" + " /name [ 8" + " 416374696f6e2031" + " ]" + " /keyIndex 0" + " /colorIndex 0" + " /isOpen 1" + " /eventCount 1" + " /event-1 {" + " /useRulersIn1stQuadrant 0" + " /internalName (adobe_exportDocument)" + " /localizedName [ 6" + " 4578706f7274" + " ]" + " /isOpen 0" + " /isOn 1" + " /hasDialog 1" + " /showDialog 0" + " /parameterCount 7" + " /parameter-1 {" + " /key 1885434477" + " /showInPalette 0" + " /type (raw)" + " /value < 104" +
     " " +
-    "06" + // quality
+    "06" + // quality in hex from 01 to 0a
     "000000" +
-    "01" + //
+    "01" + // compression methods
     "000000" +
-    "01" + //
+    "03" + // number of scans, when progressive compression: from 03 to 05
     "000000" +
-    "01" + //
+    "01" + // anti-aliasing
     "0000000000" +
     "2c01" + // resolution: reverse pairs 012c is a 300 dpi in hex
-    "01" + // color model
-    "00000000000000" +
-    "01" + // mayby it's a profile
-    "000000" +
+    "01" + // color models 01 - RGB, 02 - CMYK, 03 - Grayscale
+    "0000000000000001000000" +
     " 0000000000000000000000000000000000000000000000000000000000000000" +
     " 0000000000000000000000000000000000000000000000000000000000000000" +
-    " 0000000000000000" +
+    " 0000000001000000" + // color profile, when RGB or CMYK
     " >" + " /size 104" + " }" +
     " /parameter-2 {" + // jpg file name
     " /key 1851878757" + " /showInPalette -1" + " /type (ustring)" +
