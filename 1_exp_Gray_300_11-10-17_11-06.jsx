@@ -1,9 +1,10 @@
 //@target illustrator-19
 ;(function () {
-  var str = '';
+  var str = '', str_compatible = '';
   try {
     if (new File(activeDocument.fullName).exists) {
-      str = ('' + activeDocument.fullName).slice(0, -3) + '.jpg';
+      str            = ('' + activeDocument.fullName).slice(0, -3) + '.jpg';
+      str_compatible = encodeStrToCompatibleAnsii(new File(str).fsName);
     } else {
       throw new Error("The file doesn't exists\nSave the file and try again");
       return;
@@ -30,8 +31,8 @@
     " >" + " /size 104" + " }" +
     " /parameter-2 {" + // jpg file name
     " /key 1851878757" + " /showInPalette -1" + " /type (ustring)" +
-    " /value [ " + new File(str).fsName.length + "" + // string length
-    "               " + strToAnsii(new File(str).fsName) +
+    " /value [ " + str_compatible.length / 2 + "" + // string length
+    "               " + str_compatible +
     " ]" + " }" + " /parameter-3 {" + " /key 1718775156" + " /showInPalette -1" + " /type (ustring)" + " /value [ 16" + " 4a5045472066696c6520666f726d6174" + " ]" + " }" + " /parameter-4 {" + " /key 1702392942" + " /showInPalette -1" + " /type (ustring)" + " /value [ 12" + " 6a70672c6a70652c6a706567" + " ]" + " }" +
     " /parameter-5 {" + // use artboards
     " /key 1936548194" + " /showInPalette -1" + " /type (boolean)" +
@@ -61,29 +62,17 @@
     app.unloadAction(aiActionSetName, ""); // set name
   }
 
-  function strToAnsii(str) {
-    var newStr = '';
+  function encodeStrToCompatibleAnsii(str) {
+    var result = '';
     for (var i = 0; i < str.length; i++) {
-      newStr += _fixedCharCodeAt(str, i).toString(16);
-    }
-    return newStr;
-
-    function _fixedCharCodeAt(str, idx) {
-      var ii   = idx || 0;
-      var code = str.charCodeAt(ii);
-      var hi, low;
-      if (0xD800 <= code && code <= 0xDBFF) {
-        hi  = code;
-        low = str.charCodeAt(ii + 1);
-        if (isNaN(low)) {
-          throw 'Старшая часть суррогатной пары без следующей младшей в fixedCharCodeAt()';
-        }
-        return ((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000;
+      var chr = File.encode(str[i]);
+      chr     = chr.replace(/%/gmi, '');
+      if (chr.length == 1) {
+        result += chr.charCodeAt(0).toString(16);
+      } else {
+        result += chr.toLowerCase();
       }
-      if (0xDC00 <= code && code <= 0xDFFF) {
-        return false;
-      }
-      return code;
     }
+    return result;
   }
 }());
