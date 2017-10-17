@@ -1,18 +1,34 @@
 //@target illustrator-19
 ;(function () {
-  var str = '', str_compatible = '';
+  var str                       = ('' + activeDocument.fullName).slice(0, -3) + '.jpg',
+      str_compatible            = encodeStrToAnsii(new File(str).fsName),
+
+      useArtboards              = '1',
+      allArtboards              = '0',
+      artboardsRange            = '1-3',
+      useArtboards_compatible   = encodeStrToAnsii(useArtboards),
+      allArtboards_compatible   = encodeStrToAnsii(allArtboards),
+      artboardsRange_compatible = encodeStrToAnsii(artboardsRange),
+
+      res                       = 300,
+      resCompatible             = res.toString(16).slice(1) + '0' + res.toString(16).slice(0, 1),
+
+      quality                   = 6,
+      quality_compatible        = '0' + quality.toString(16),
+      compressionMethod         = '01',
+      scans                     = '03',
+      antiAliasing              = '02';
+
   try {
-    if (new File(activeDocument.fullName).exists) {
-      str            = ('' + activeDocument.fullName).slice(0, -3) + '.jpg';
-      str_compatible = encodeStrToCompatibleAnsii(new File(str).fsName);
-    } else {
+    if (!new File(activeDocument.fullName).exists) {
       throw new Error("The file doesn't exists\nSave the file and try again");
       return;
     }
   } catch (e) {
     alert(e.message);
   }
-  var actStr1 = "/version 3" + "/name [ 5" + " 5365742032" + "]" + "/isOpen 1" + "/actionCount 1" + "/action-1 {" + " /name [ 8" + " 416374696f6e2031" + " ]" + " /keyIndex 0" + " /colorIndex 0" + " /isOpen 1" + " /eventCount 1" + " /event-1 {" + " /useRulersIn1stQuadrant 0" + " /internalName (adobe_exportDocument)" + " /localizedName [ 6" + " 4578706f7274" + " ]" + " /isOpen 0" + " /isOn 1" + " /hasDialog 1" + " /showDialog 0" + " /parameterCount 7" + " /parameter-1 {" + " /key 1885434477" + " /showInPalette 0" + " /type (raw)" + " /value < 104" +
+
+  var actStr1 = "/version 3" + "/name [ 8" + " 536574204e616d65" + "]" + "/isOpen 1" + "/actionCount 1" + "/action-1 {" + " /name [ 11" + " 416374696f6e204e616d65" + " ]" + " /keyIndex 0" + " /colorIndex 0" + " /isOpen 1" + " /eventCount 1" + " /event-1 {" + " /useRulersIn1stQuadrant 0" + " /internalName (adobe_exportDocument)" + " /localizedName [ 6" + " 4578706f7274" + " ]" + " /isOpen 0" + " /isOn 1" + " /hasDialog 1" + " /showDialog 0" + " /parameterCount 7" + " /parameter-1 {" + " /key 1885434477" + " /showInPalette 0" + " /type (raw)" + " /value < 104" +
     " " +
     "06" + // quality in hex from 01 to 0a
     "000000" +
@@ -22,7 +38,7 @@
     "000000" +
     "01" + // anti-aliasing
     "0000000000" +
-    "2c01" + // resolution: reverse pairs 012c is a 300 dpi in hex
+    "3402" + // resolution: reverse pairs 012c is a 300 dpi in hex, max 564 dpi
     "01" + // color models 01 - RGB, 02 - CMYK, 03 - Grayscale
     "0000000000000001000000" +
     " 0000000000000000000000000000000000000000000000000000000000000000" +
@@ -48,9 +64,9 @@
     " 31" +
     " ]" + " }" + " }" + "}";
 
-  runAiAction(actStr1, "Action 1", "Set 2");
+  runAction(actStr1, "Action Name", "Set Name");
 
-  function runAiAction(aiActionString, aiActionName, aiActionSetName) {
+  function runAction(aiActionString, aiActionName, aiActionSetName) {
     var f = new File('~/ScriptAction.aia');
     f.open('w');
     f.write(aiActionString);
@@ -62,7 +78,7 @@
     app.unloadAction(aiActionSetName, ""); // set name
   }
 
-  function encodeStrToCompatibleAnsii(str) {
+  function encodeStrToAnsii(str) {
     var result = '';
     for (var i = 0; i < str.length; i++) {
       var chr = File.encode(str[i]);
