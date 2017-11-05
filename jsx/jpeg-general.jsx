@@ -9,7 +9,7 @@ function ai_exp_jpg() {
 
       useArtboards              = '1',
       allArtboards              = '0',
-      artboardsRange            = prompt('Artboard range', '2-3'),
+      artboardsRange            = prompt('Artboards range:', '2-3'),
       artboardsRange_compatible = encodeStrToAnsii(artboardsRange),
 
       res                       = 250,
