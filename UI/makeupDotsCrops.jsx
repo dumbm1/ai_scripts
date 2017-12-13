@@ -60,7 +60,7 @@ function makeFace() {
         gr_cmyk.add('statictext', [0, 0, 45, 20], 'cmyk:');
         w.colsCmyk = gr_cmyk.add('edittext', [0, 0, 115, 20], 'cmyk');
         gr_serv.add('statictext', [0, 0, 45, 20], 'Serv:');
-        w.colsServ = gr_serv.add('edittext', [0, 0, 115, 20], 'w');
+        w.colsServ = gr_serv.add('edittext', [0, 0, 115, 20], 'W');
         gr_pant.add('statictext', [0, 0, 45, 20], 'Pant:');
         w.colsPant = gr_pant.add('edittext', [0, 0, 295, 40], '485', {multiline: true});
 
@@ -170,7 +170,7 @@ function makeFace() {
             layoutName: w.layoutName.text,
             colsCmyk: new Array(w.colsCmyk.text),
             colsPant: formatPantStr(w.colsPant.text),
-            colsServ: formatPantStr(w.colsServ.text, 'low'),
+            colsServ: formatPantStr(w.colsServ.text/*, 'low'*/),
             lays: ['color', 'test'],
             z: z(),
             marg: +w.marg.text,
@@ -1243,11 +1243,11 @@ function makeupDots(o) {
         }
         this.serv = function () {
             return {
-                "film": '0,0,0,20',
-                "w": '81,61,5,5',
-                "w2": '61,5,81,5',
-                "l": '5,81,61,5',
-                "pr": '5,5,81,61',
+                "Film": '0,0,0,20',
+                "W": '81,61,5,5',
+                "W2": '61,5,81,5',
+                "L": '5,81,61,5',
+                "Pr": '5,5,81,61',
             }
         }
         this.pant = function () {
