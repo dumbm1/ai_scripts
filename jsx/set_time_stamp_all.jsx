@@ -3,29 +3,36 @@ set_time_stamp();
 function set_time_stamp() {
   var txtFrameDateName = '__current_date_and_time__',
       txtFrameDate,
+      txtDateFrames = _getTextFrameByName (txtFrameDateName),
       now              = new Date(),
       strDate          = 'Дата:\n' + _formatDate(now) + '\nВремя:\n' + _formatTime(now);
 
   try {
     //txtFrameDate = activeDocument.textFrames.getByName(txtFrameDateName);
-    txtFrameDate = _getTextFrameByName(txtFrameDateName);
-    txtFrameDate.contents = strDate;
+    for (var i = 0; i < txtDateFrames.length; i++) {
+        var currFr = txtDateFrames[i];
+        currFr.contents = strDate;
+     }
+    //txtFrameDate = _getTextFrameByName(txtFrameDateName);
+    //txtFrameDate.contents = strDate;
   } catch (e) {
-    var txtFrameDate = _getSelFrame();
-    if (!txtFrameDate) return;
-    if (!(+confirm('Make new date frame from selected frame?'))) return;
-    txtFrameDate.contents = strDate;
-    txtFrameDate.name = txtFrameDateName;
+    //var txtFrameDate = _getSelFrame();
+    //if (!txtFrameDate) return;
+    //if (!(+confirm('Make new date frame from selected frame?'))) return;
+    //txtFrameDate.contents = strDate;
+    //txtFrameDate.name = txtFrameDateName;
     return;
   }
 
     function _getTextFrameByName(name) {
+        var res = [];
         for (var i = 0; i < activeDocument.textFrames.length; i++) {
             var currFrame = activeDocument.textFrames[i];
             if (currFrame.name != name) continue;
-            if (!currFrame.layer.visible) continue;
-            return currFrame;
+            //if (!currFrame.layer.visible) continue;
+            res.push(currFrame);
         }
+      return res;
     }
 
   function _getSelFrame() {
