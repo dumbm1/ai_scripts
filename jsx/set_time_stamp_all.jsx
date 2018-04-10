@@ -3,16 +3,17 @@ set_time_stamp();
 function set_time_stamp() {
   var txtFrameDateName = '__current_date_and_time__',
       txtFrameDate,
-      txtDateFrames = _getTextFrameByName (txtFrameDateName),
+      txtDateFrames    = _getTextFrameByName(txtFrameDateName),
       now              = new Date(),
       strDate          = 'Дата:\n' + _formatDate(now) + '\nВремя:\n' + _formatTime(now);
 
   try {
     //txtFrameDate = activeDocument.textFrames.getByName(txtFrameDateName);
     for (var i = 0; i < txtDateFrames.length; i++) {
-        var currFr = txtDateFrames[i];
-        currFr.contents = strDate;
-     }
+      var currFr = txtDateFrames[i];
+      if (!currFr.layer.visible) continue;
+      currFr.contents = strDate;
+    }
     //txtFrameDate = _getTextFrameByName(txtFrameDateName);
     //txtFrameDate.contents = strDate;
   } catch (e) {
@@ -24,16 +25,16 @@ function set_time_stamp() {
     return;
   }
 
-    function _getTextFrameByName(name) {
-        var res = [];
-        for (var i = 0; i < activeDocument.textFrames.length; i++) {
-            var currFrame = activeDocument.textFrames[i];
-            if (currFrame.name != name) continue;
-            //if (!currFrame.layer.visible) continue;
-            res.push(currFrame);
-        }
-      return res;
+  function _getTextFrameByName(name) {
+    var res = [];
+    for (var i = 0; i < activeDocument.textFrames.length; i++) {
+      var currFrame = activeDocument.textFrames[i];
+      if (currFrame.name != name) continue;
+      //if (!currFrame.layer.visible) continue;
+      res.push(currFrame);
     }
+    return res;
+  }
 
   function _getSelFrame() {
     var selFrame = false;
