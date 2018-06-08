@@ -1,0 +1,1 @@
+C:/Users/m.shagiev/git/ai_scripts/autors/splxgf/ChangeColorSG02.jsx
