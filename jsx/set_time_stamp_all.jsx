@@ -1,28 +1,34 @@
 ﻿//@target illustrator
 set_time_stamp();
 function set_time_stamp() {
-  var txtFrameDateName = '__current_date_and_time__',
-      txtFrameDate,
-      txtDateFrames    = _getTextFrameByName(txtFrameDateName),
-      now              = new Date(),
-      strDate          = 'Дата:\n' + _formatDate(now) + '\nВремя:\n' + _formatTime(now);
+  var txtFrameFullDateName = '__current_date_and_time__',
+      txtFrameDateName     = '__current_date__',
+      txtFullDateFrames    = _getTextFrameByName(txtFrameFullDateName),
+      txtDateFrames        = _getTextFrameByName(txtFrameDateName),
+      now                  = new Date(),
+      strFullDate          = 'Дата:\n' + _formatDate(now) + '\nВремя:\n' + _formatTime(now),
+      strDate              = 'Дата: ' + _formatDate(now);
 
-  try {
-    //txtFrameDate = activeDocument.textFrames.getByName(txtFrameDateName);
-    for (var i = 0; i < txtDateFrames.length; i++) {
-      var currFr = txtDateFrames[i];
-      if (!currFr.layer.visible) continue;
-      currFr.contents = strDate;
+  {
+    var currFr;
+    try {
+      for (var i = 0; i < txtFullDateFrames.length; i++) {
+        currFr = txtFullDateFrames[i];
+        if (!currFr.layer.visible) continue;
+        currFr.contents = strFullDate;
+      }
+    } catch (e) {
+      return;
     }
-    //txtFrameDate = _getTextFrameByName(txtFrameDateName);
-    //txtFrameDate.contents = strDate;
-  } catch (e) {
-    //var txtFrameDate = _getSelFrame();
-    //if (!txtFrameDate) return;
-    //if (!(+confirm('Make new date frame from selected frame?'))) return;
-    //txtFrameDate.contents = strDate;
-    //txtFrameDate.name = txtFrameDateName;
-    return;
+    try {
+      for (var j = 0; j < txtDateFrames.length; j++) {
+        currFr = txtDateFrames[j];
+        if (!currFr.layer.visible) continue;
+        currFr.contents = strDate;
+      }
+    } catch (e) {
+      return;
+    }
   }
 
   function _getTextFrameByName(name) {
