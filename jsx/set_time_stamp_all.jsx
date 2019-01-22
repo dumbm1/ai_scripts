@@ -3,6 +3,8 @@ set_time_stamp();
 function set_time_stamp() {
   var txtFrameFullDateName = '__current_date_and_time__',
       txtFrameDateName     = '__current_date__',
+      txtFrameDateHF       = /Дата: +\d{2}-\d{2}-\d{4} */, //Дата:  14-09-2018
+      txtHFFrames          = _getTxtFrByCont(txtFrameDateHF),
       txtFullDateFrames    = _getTextFrameByName(txtFrameFullDateName),
       txtDateFrames        = _getTextFrameByName(txtFrameDateName),
       now                  = new Date(),
@@ -12,12 +14,24 @@ function set_time_stamp() {
   {
     var currFr;
     try {
+      for (var i = 0; i < txtHFFrames.length; i++) {
+        currFr = txtHFFrames[i];
+        if (!currFr.layer.visible) continue;
+        currFr.contents = strDate;
+      }
+    } catch (e) {
+      alert('Alternate date version\n' + e);
+      alert(e);
+      return;
+    }
+    try {
       for (var i = 0; i < txtFullDateFrames.length; i++) {
         currFr = txtFullDateFrames[i];
         if (!currFr.layer.visible) continue;
         currFr.contents = strFullDate;
       }
     } catch (e) {
+      alert('Full date version\n' + e);
       return;
     }
     try {
@@ -27,8 +41,20 @@ function set_time_stamp() {
         currFr.contents = strDate;
       }
     } catch (e) {
+      alert('Short date version\n' + e);
       return;
     }
+  }
+
+  function _getTxtFrByCont(re) {
+    var res = [];
+    for (var i = 0; i < activeDocument.textFrames.length; i++) {
+      var currFrame = activeDocument.textFrames[i];
+      if (!currFrame.contents.match(re)) continue;
+      //if (!currFrame.layer.visible) continue;
+      res.push(currFrame);
+    }
+    return res;
   }
 
   function _getTextFrameByName(name) {
