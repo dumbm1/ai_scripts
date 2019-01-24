@@ -1,5 +1,4 @@
 ////@target illustrator-22
-//todo: move original file to the folder 'rm'
 
 ;(function saveAsNow() {
   var d              = activeDocument,
@@ -10,6 +9,14 @@
       dPath          = d.path,
       str            = (dPath + '/' + dName),
       str_compatible = encodeStrToAnsii(new File(str).fsName);
+
+  if (d.fullName == str) return; // ?? or add v2, v3 etc...
+
+  for (var i = documents.length - 1; i >= 0; i--) {
+    var currDoc = documents[i];
+    if (currDoc.fullName != str) continue;
+    currDoc.close(SaveOptions.DONOTSAVECHANGES);
+  }
 
   {
     var actStr = '' +
