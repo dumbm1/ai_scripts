@@ -3,8 +3,8 @@
 ;(function saveAsNow() {
   var d              = activeDocument,
       dName          = d.name.replace(
-        /_\d\d[-._]\d\d[-._]\d{2,4}(.*)(\.ai)/,
-        '_' + formatDate() + '$1' + '$2'
+        /_(\d\d[-._])?\d\d[-._]\d{2,4}(.*)(\.ai)/,
+        '_' + formatDate() + '$2' + '$3'
       ),
       dPath          = d.path,
       str            = (dPath + '/' + dName),
