@@ -8,7 +8,7 @@ function set_time_stamp() {
       txtFullDateFrames    = _getTextFrameByName(txtFrameFullDateName),
       txtDateFrames        = _getTextFrameByName(txtFrameDateName),
       now                  = new Date(),
-      strFullDate          = 'Дата:\n' + _formatDate(now) + '\nВремя:\n' + _formatTime(now),
+      strFullDate          = 'Дата:\n' + _formatDate(now) + '\n' + _formatTime(now) + '\n(GMT+3)',
       strDate              = 'Дата: ' + _formatDate(now);
 
   {
@@ -101,9 +101,9 @@ function set_time_stamp() {
     var mm = date.getMonth() + 1;
     if (mm < 10) mm = '0' + mm;
 
-    var yy = date.getFullYear() % 100;
-    if (yy < 10) yy = '0' + yy;
+    var yyyy = date.getFullYear() /*% 100*/;
+    // if (yy < 10) yy = yyyy;
 
-    return dd + '.' + mm + '.' + yy;
+    return dd + '.' + mm + '.' + yyyy;
   }
 }
