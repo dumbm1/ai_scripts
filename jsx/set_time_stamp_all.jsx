@@ -11,6 +11,17 @@ function set_time_stamp() {
       strFullDate          = 'Дата:\n' + _formatDate(now) + '\n' + _formatTime(now) + '\n(GMT+3)',
       strDate              = 'Дата: ' + _formatDate(now);
 
+  if (!txtHFFrames.length &&
+      !txtDateFrames.length &&
+      !txtFullDateFrames.length &&
+      selection.length <= 5) {
+    for (var i = 0; i < selection.length; i++) {
+      var obj = selection[i];
+      if (obj.typename != 'TextFrame') continue;
+      txtFullDateFrames.push(obj);
+    }
+  }
+
   {
     var currFr;
     try {
