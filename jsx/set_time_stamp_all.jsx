@@ -17,6 +17,7 @@ function set_time_stamp() {
       selection.length <= 5) {
     for (var i = 0; i < selection.length; i++) {
       var obj = selection[i];
+      obj.name = txtFrameFullDateName;
       if (obj.typename != 'TextFrame') continue;
       txtFullDateFrames.push(obj);
     }
