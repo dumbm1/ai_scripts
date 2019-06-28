@@ -1,28 +1,53 @@
 //todo: add processing the GroupItem
 
 ;(function getMinFontHeight() {
-  var PT_TO_MM = 0.352777778,
-      txtFrameDouble,
-      txtFrameDoubleCaps,
-      frameCurves,
-      frameCurvesCaps,
-      fontH, fontW, fontHCaps, fontWCaps;
 
   try {
-    txtFrameDouble = selection[0].duplicate();
-    txtFrameDoubleCaps = selection[0].duplicate();
-    _processDoubles();
+    var result = processDoubles(selection);
+    if (!result) throw new Error();
+    alert('Capital:\t' + result[0] + ' mm\nSmall:\t' + result[1] + ' mm');
   } catch (e) {
-    txtFrameDouble = selection.parent.textFrames[0].duplicate();
-    txtFrameDoubleCaps = selection.parent.textFrames[0].duplicate();
-    _processDoubles();
-  } finally {
-    alert('Capital:\t' + Math.min(fontHCaps, fontWCaps) + ' mm\nSmall:\t' + Math.min(fontH, fontW) + ' mm');
+    alert(e);
   }
 
-  function _processDoubles() {
-    txtFrameDouble.contents = 'www';
-    txtFrameDoubleCaps.contents = 'WWW';
+  function processDoubles(selection) {
+
+    var PT_TO_MM = 0.352777778,
+        txtFrameDouble,
+        txtFrameDoubleCaps,
+        frameCurves,
+        frameCurvesCaps,
+        fontH, fontW, fontHCaps, fontWCaps,
+        elem;
+
+    elem = (function f() { // try to get the TextFrame
+
+      if (!selection[0] && !selection.typename) throw new Error('No selection!'); // no selection
+
+      if (selection[0]) { // object mode
+        if (selection.length > 1) throw new Error('So meny selection!');
+        if (selection[0].typename === 'GroupItem') { // try to get TextFrame from GrouItem
+          if (selection[0].pageItems.length > 1) throw new Error('It\'s a complex group!');
+          if (selection[0].pageItems[0].typename !== 'TextFrame') {
+            throw new Error('Selection in group doesn\'t a Text Frame!');
+          }
+          return selection[0].pageItems[0];
+
+        }
+        if (selection[0].typename !== 'TextFrame') throw new Error('Selection doesn\'t a Text Frame!');
+        return selection[0];
+      } else if (selection.typename) { // text mode
+        return selection.parent.textFrames[0];
+      }
+
+      throw new Error();
+    })();
+
+    txtFrameDouble = elem.duplicate();
+    txtFrameDoubleCaps = elem.duplicate();
+
+    txtFrameDouble.contents = 'wwwww';
+    txtFrameDoubleCaps.contents = 'WWWWW';
     frameCurves = txtFrameDouble.createOutline();
     frameCurvesCaps = txtFrameDoubleCaps.createOutline();
 
@@ -33,5 +58,7 @@
 
     frameCurves.remove();
     frameCurvesCaps.remove();
+
+    return [Math.min(fontHCaps, fontWCaps), Math.min(fontH, fontW)];
   }
 })();
