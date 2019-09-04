@@ -1,14 +1,45 @@
 ////@target illustrator-22
 
-;(function saveAsNow() {
-  var d              = activeDocument,
-      dName          = d.name.replace(
-        /_(\d\d[-._])?\d\d[-._]\d{2,4}(.*)(\.ai)/,
-        '_' + formatDate() + '$2' + '$3'
-      ),
-      dPath          = d.path,
-      str            = (dPath + '/' + dName),
-      str_compatible = encodeStrToAnsii(new File(str).fsName);
+//todo: input check
+
+;(function saveLayout() {
+  var layoutNumb = prompt('INPUT 5 OR 9 DIGITS', ''),
+      d          = activeDocument,
+      tFrames    = d.textFrames,
+      reLayoutNumb, replacerLayoutNumb,
+      reDate     = /(\d\d?(\.|-|\/|\\)){2}\d{2}(\d{2})?/,
+      reName, dName, dPath, str, str_compatible;
+
+  if (layoutNumb.length == 5) {
+    reName = /^([A-Z_]{2,6}\d{4}|\d{4})\d{5}(.*)(\.ai)/g;
+    dName = d.name.replace(reName, '$1' + layoutNumb + '$2' + '$3');
+    reLayoutNumb = /(^\d{4})\d{5}/;
+    replacerLayoutNumb = '$1' + layoutNumb;
+
+  } else if (layoutNumb.length == 9) {
+    if (d.name.match(/^[A-Z_]{2,6}/)) {
+      reName = /^([A-Z_]{2,6})\d{9}(.*)(\.ai)/g;
+      dName = d.name.replace(reName, '$1' + layoutNumb + '$2' + '$3');
+    } else if (layoutNumb.length == 5) {
+      reName = /^\d{9}(.*)(\.ai)/g;
+      dName = d.name.replace(reName, layoutNumb + '$1' + '$2');
+    } else {
+      throw new Error('Incorrect input');
+    }
+
+    reLayoutNumb = /^\d{9}/;
+    replacerLayoutNumb = layoutNumb;
+  }
+
+  dPath = d.path;
+  str = (dPath + '/' + dName);
+  str_compatible = encodeStrToAnsii(new File(str).fsName);
+
+  for (var i = 0; i < tFrames.length; i++) {
+    var tFrame = tFrames[i];
+    tFrame.contents = tFrame.contents.replace(reLayoutNumb, replacerLayoutNumb);
+    tFrame.contents = tFrame.contents.replace(reDate, formatDate());
+  }
 
   if (d.fullName == str) return; // ?? or add v2, v3 etc...
 
