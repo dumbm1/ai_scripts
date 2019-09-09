@@ -884,7 +884,7 @@ function makeupDots(o) {
         } else {
             var newSpot = _addNewSpot(spotName, cmykComponents);
             //  $.writeln ( newSpot.spot.spotName );
-            return newSpot;
+            return sw;
         }
 
         function _getSpotByNameStrict(spotName) {
@@ -917,11 +917,11 @@ function makeupDots(o) {
             newColor.yellow = +cmykComponents[2];
             newColor.black = +cmykComponents[3];
 
-            newSpot.name = spotName;
-            newSpot.colorType = ColorModel.SPOT;
-            newSpot.color = newColor;
+            sw.name = spotName;
+            sw.colorType = ColorModel.SPOT;
+            sw.color = newColor;
 
-            newSpotColor.spot = newSpot;
+            newSpotColor.spot = sw;
             newSpotColor.tint = 100;
 
             return newSpotColor;

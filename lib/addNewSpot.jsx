@@ -13,11 +13,11 @@ function addNewSpot(name, col) {
   newColor.yellow  = col[2];
   newColor.black   = col[3];
 
-  newSpot.name      = name;
-  newSpot.colorType = ColorModel.SPOT;
-  newSpot.color     = newColor;
+  sw.name = name;
+  sw.colorType = ColorModel.SPOT;
+  sw.color = newColor;
 
-  newSpotColor.spot = newSpot;
+  newSpotColor.spot = sw;
   newSpotColor.tint = 100;
 
   return newSpotColor;
