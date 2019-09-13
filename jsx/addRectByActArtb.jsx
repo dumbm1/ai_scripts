@@ -30,11 +30,13 @@
 
   function _addRect() {
 
-    var rect = [/*[top, left, width, height]*/
+    var rectParams = [/*[top, left, width, height]*/
       artbRect[1], artbRect[0], artbRect[2], -artbRect[3]
-    ];
+    ], rect;
 
-    return lay.pathItems.rectangle(rect[0], rect[1], rect[2], rect[3]);
+    rect = lay.pathItems.rectangle(rectParams[0], rectParams[1], rectParams[2], rectParams[3]);
+    rect.move(rect.layer, ElementPlacement.PLACEATEND);
+    return rect;
   }
 
   function _getSw(swName) {
