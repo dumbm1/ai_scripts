@@ -9,6 +9,7 @@ var MM_TO_PT     = 2.834645668,
     extendValue  = 10 * MM_TO_PT,
     rect, rect2, frame,
     fillCol, strokeCol,
+    fact,
     textContents = prompt('Set text: ', 'ТОЛЬКО «ТЕХНИЧЕСКИЙ» ТЕКСТ (УВЕЛИЧЕНИЕ 200%)');
 
 gr.move(lay, ElementPlacement.PLACEATEND);
@@ -17,6 +18,7 @@ strokeCol = new CMYKColor();
 strokeCol.black = 100;
 
 fillCol = new CMYKColor();
+fillCol.black = 0;
 
 rect = gr.pathItems.rectangle(
   sel.top + extendValue,
@@ -32,8 +34,12 @@ rect2 = gr.pathItems.rectangle(
   extendValue * 4
 );
 
-rect.fillColor = rect2.fillColor = fillCol;
-rect.strokeColor = rect2.strokeColor = strokeCol;
+rect.fillColor = fillCol;
+rect.strokeColor = strokeCol;
+rect.strokeWidth = 1;
+rect2.fillColor = fillCol;
+rect2.strokeColor = strokeCol;
+rect2.strokeWidth = 1;
 
 frame = gr.textFrames.add();
 frame.contents = textContents;
@@ -41,11 +47,9 @@ frame.paragraphs[0].paragraphAttributes.justification = Justification.CENTER;
 frame.position = [
   rect2.left + (rect2.width - frame.width) / 2,
   rect2.top - (rect2.height - frame.height) / 2
-
 ];
 
-function fitFrameToArea(frame) {
-  //todo: (1) make curves double (2) compare width and height (3) increase text size
-}
+fact = (rect2.width - extendValue) * 100 / frame.width;
+frame.resize(fact, fact, true, true, true, true, 0.00, Transformation.CENTER);
 
 // }
