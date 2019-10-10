@@ -5,13 +5,13 @@
 (function rmArtbs() {
   if(!documents.length) return;
 
-  var PROCESS_ALL_ARTBS = true,
+  var PROCESS_ALL_ARTBS = false,
       d,
       act_d;
 
-  if(documents.length > 1) {
+/*  if(documents.length > 1) {
     PROCESS_ALL_ARTBS = confirm('Process All Open Documents?');
-  }
+  }*/
 
   if (!PROCESS_ALL_ARTBS) {
     d = activeDocument;
