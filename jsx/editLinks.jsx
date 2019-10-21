@@ -37,6 +37,7 @@
         _processEps(key);
         break;
       case '.psd':
+      case '.psb':
       case '.png':
       case '.apng':
       case '.jpeg':

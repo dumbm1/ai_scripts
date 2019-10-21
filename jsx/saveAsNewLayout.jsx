@@ -11,7 +11,7 @@
       reName, dName, dPath, str, str_compatible;
 
   if (layoutNumb.length == 5) {
-    reName = /^([A-Z_]{2,6}\d{4}|\d{4})\d{5}(.*)(\.ai)/g;
+    reName = /^([A-Za-z_]{2,6}\d{4}|\d{4})\d{5}(.*)(\.ai)/g;
     dName = d.name.replace(reName, '$1' + layoutNumb + '$2' + '$3');
     reLayoutNumb = /(^\d{4})\d{5}/;
     replacerLayoutNumb = '$1' + layoutNumb;
