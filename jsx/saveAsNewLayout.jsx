@@ -10,6 +10,8 @@
       reDate     = /(\d\d?(\.|-|\/|\\)){2}\d{2}(\d{2})?/,
       reName, dName, dPath, str, str_compatible;
 
+  layoutNumb = layoutNumb.replace(/\s+/mig, '');
+
   if (layoutNumb.length == 5) {
     reName = /^([A-Za-z_]{2,6}\d{4}|\d{4})\d{5}(.*)(\.ai)/g;
     dName = d.name.replace(reName, '$1' + layoutNumb + '$2' + '$3');
