@@ -1,8 +1,11 @@
-#Adobe ExtendScript for Illustrator
+Adobe ExtendScript for Illustrator
+===
 
-##Unordered set of ~40 scripts and ui-scripts
+Unordered set of ~40 scripts and ui-scripts
+---
 
-###The main purpose is: 
+The main purpose is:
+---
 
 * automation of some aspects of preparation to flexographic printing:
     * page output
