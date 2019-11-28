@@ -7,7 +7,7 @@
   var lays = activeDocument.layers;
   var techLays = TECH_LAYS ||
                  prompt(
-                   'Technical Layers list: ', 'LAYOUT, W, COMMON, @_TT, COLORS'
+                   'Technical Layers list: ', 'LAYOUT, W, COMMON, @_TT, COLORS, KLAPAN'
                  ).replace(
                    /^ +/, ''
                  ).replace(
@@ -27,4 +27,4 @@
 
     }
   }
-}(/*['LAYOUT', 'W', 'COMMON', '@_TT', 'COLORS']*/));
+}(/*['LAYOUT', 'W', 'COMMON', '@_TT', 'COLORS, KLAPAN']*/));
