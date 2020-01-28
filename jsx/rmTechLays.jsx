@@ -7,7 +7,7 @@
   var lays = activeDocument.layers;
   var techLays = TECH_LAYS ||
                  prompt(
-                   'Technical Layers list: ', 'LAYOUT, W, COMMON, @_TT, COLORS, KLAPAN'
+                   'Technical Layers list: ', 'LAYOUT, COMMON, @_TT, COLORS, KLAPAN, W'
                  ).replace(
                    /^ +/, ''
                  ).replace(
@@ -20,7 +20,7 @@
 
     for (var j = 0; j < techLays.length; j++) {
 
-      if (lays[i].name != techLays[j]) continue;
+      if (lays[i].name.toUpperCase() != techLays[j]) continue;
       lays[i].visible = true;
       lays[i].remove();
       break;

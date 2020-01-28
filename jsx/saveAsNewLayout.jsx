@@ -1,6 +1,4 @@
-////@target illustrator-22
-
-//todo: input check
+//@target illustrator-22
 
 ;(function saveLayout() {
   var layoutNumb = prompt('INPUT 5 OR 9 DIGITS', ''),
@@ -10,10 +8,8 @@
       reDate     = /(\d\d?(\.|-|\/|\\)){2}\d{2}(\d{2})?/,
       reName, dName, dPath, str, str_compatible;
 
-  layoutNumb = layoutNumb.replace(/\s+/mig, '');
-
   if (layoutNumb.length == 5) {
-    reName = /^([A-Za-z_]{2,6}\d{4}|\d{4})\d{5}(.*)(\.ai)/g;
+    reName = /^([A-Z_]{2,6}\d{4}|\d{4})\d{5}(.*)(\.ai)/g;
     dName = d.name.replace(reName, '$1' + layoutNumb + '$2' + '$3');
     reLayoutNumb = /(^\d{4})\d{5}/;
     replacerLayoutNumb = '$1' + layoutNumb;
@@ -22,11 +18,9 @@
     if (d.name.match(/^[A-Z_]{2,6}/)) {
       reName = /^([A-Z_]{2,6})\d{9}(.*)(\.ai)/g;
       dName = d.name.replace(reName, '$1' + layoutNumb + '$2' + '$3');
-    } else if (layoutNumb.length == 5) {
+    } else {
       reName = /^\d{9}(.*)(\.ai)/g;
       dName = d.name.replace(reName, layoutNumb + '$1' + '$2');
-    } else {
-      throw new Error('Incorrect input');
     }
 
     reLayoutNumb = /^\d{9}/;
@@ -39,8 +33,13 @@
 
   for (var i = 0; i < tFrames.length; i++) {
     var tFrame = tFrames[i];
-    tFrame.contents = tFrame.contents.replace(reLayoutNumb, replacerLayoutNumb);
-    tFrame.contents = tFrame.contents.replace(reDate, formatDate());
+    // if (tFrame.name != '__$layoutInf$__') continue;
+    if(tFrame.contents.match(reLayoutNumb)) {
+      tFrame.contents = tFrame.contents.replace(reLayoutNumb, replacerLayoutNumb);
+    }
+    if(tFrame.contents.match(reDate)) {
+      tFrame.contents = tFrame.contents.replace(reDate, formatDate());
+    }
   }
 
   if (d.fullName == str) return; // ?? or add v2, v3 etc...
