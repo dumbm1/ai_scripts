@@ -7,7 +7,7 @@ var PT         = 1,
     PICA_TO_PT = 12,
 
     RAD_TO_DGR = 57.295779513,
-    DGR_TO_RAD = 00.017453293, // Math.PI / 180
+    DGR_TO_RAD = 0.017453293, // Math.PI / 180
 
     PT_TO_CM   = 0.035277777,
     PT_TO_INCH = 0.013888888,
