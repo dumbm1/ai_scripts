@@ -1,151 +1,124 @@
-////@target illustrator-22
-
+//@target illustrator-22
 ;(function saveAsNow() {
-  var d              = activeDocument,
-      dName          = d.name.replace(
-        /_\d\d[-._]\d\d[-._]\d{2,4}(.*)(\.ai)/,
-        '_' + formatDate() + '$1' + '$2'
-      ),
-      dPath          = d.path,
-      str            = (dPath + '/' + dName),
-      str_compatible = encodeStrToAnsii(new File(str).fsName);
+  /**
+   * close active document
+   * move file to the new folder via read/write
+   **/
 
-  if (d.fullName == str) return; // ?? or add v2, v3 etc...
+  try {
+    var status = '??? Unknown status ???';
 
-  for (var i = documents.length - 1; i >= 0; i--) {
-    var currDoc = documents[i];
-    if (currDoc.fullName != str) continue;
-    currDoc.close(SaveOptions.DONOTSAVECHANGES);
+    if (documents.length == 0) throw new Error('No open documents!');
+
+    var aD          = activeDocument,
+        adFullName  = aD.fullName,
+        folderName  = 'rm',
+        file        = new File(adFullName),
+        folder      = new Folder(file.path + '/rm'),
+        now         = _formatDate(new Date()),
+        fileNewName = _replaceDate(file, now),
+        copyStatus, renameStatus;
+
+    aD.close(SaveOptions.DONOTSAVECHANGES);
+
+    copyStatus = _copy(file, folder);
+    renameStatus = file.rename(_replaceDate(file, now));
+
+    status = 'copy status: ' + copyStatus + '\n' + 'rename status: ' + renameStatus;
+
+    open(new File(_replaceDate(file, now)));
+
+  } catch (e) {
+    status = e;
+  } finally {
+    alert(status);
+    return status;
   }
 
-  {
-    var actStr = '' +
-                 '/version 3' +
-                 '/name [ 8' + ' 536574204e616d65' + ']' + '/isOpen 1' + '/actionCount 1' + '/action-1 {' + ' /name [ 11' + ' 416374696f6e204e616d65' + ' ]' +
-                 ' /keyIndex 0' +
-                 ' /colorIndex 0' +
-                 ' /isOpen 1' +
-                 ' /eventCount 1' +
-                 ' /event-1 {' +
-                 ' /useRulersIn1stQuadrant 0' +
-                 ' /internalName (adobe_saveACopyAs)' +
-                 ' /localizedName [ 11' +
-                 ' 53617665204120436f7079' +
-                 ' ]' +
-                 ' /isOpen 0' +
-                 ' /isOn 1' +
-                 ' /hasDialog 1' +
-                 ' /showDialog 0' +
-                 ' /parameterCount 11' +
-                 ' /parameter-1 {' +
-                 ' /key 1668116594' +
-                 ' /showInPalette -1' +
-                 ' /type (boolean)' +
-                 ' /value 1' + // compression
-                 ' }' +
-                 ' /parameter-2 {' +
-                 ' /key 1885627936' +
-                 ' /showInPalette -1' +
-                 ' /type (boolean)' +
-                 ' /value 0' + // pdf compatible
-                 ' }' +
-                 ' /parameter-3 {' +
-                 ' /key 1668445298' +
-                 ' /showInPalette -1' +
-                 ' /type (integer)' +
-                 ' /value 17' +
-                 ' }' +
-                 ' /parameter-4 {' +
-                 ' /key 1702392878' +
-                 ' /showInPalette -1' +
-                 ' /type (integer)' +
-                 ' /value 1' +
-                 ' }' +
-                 ' /parameter-5 {' +
-                 ' /key 1768842092' +
-                 ' /showInPalette -1' +
-                 ' /type (integer)' +
-                 ' /value 0' +
-                 ' }' +
-                 ' /parameter-6 {' +
-                 ' /key 1918989423' +
-                 ' /showInPalette -1' +
-                 ' /type (real)' +
-                 ' /value 100.0' +
-                 ' }' +
-                 ' /parameter-7 {' +
-                 ' /key 1886545516' +
-                 ' /showInPalette -1' +
-                 ' /type (integer)' +
-                 ' /value 0' +
-                 ' }' +
-                 ' /parameter-8 {' +
-                 ' /key 1936548194' +
-                 ' /showInPalette -1' +
-                 ' /type (boolean)' +
-                 ' /value 0' + // save artboards
-                 ' }' +
-                 ' /parameter-9 {' +
-                 ' /key 1851878757' +
-                 ' /showInPalette -1' +
-                 ' /type (ustring)' +
-                 ' /value [ ' + str_compatible.length / 2 + '' + // string length
-                 '               ' + str_compatible +
-                 ' ]' +
-                 ' }' +
-                 ' /parameter-10 {' +
-                 ' /key 1718775156' +
-                 ' /showInPalette -1' +
-                 ' /type (ustring)' +
-                 ' /value [ 35' +
-                 ' 41646f626520496c6c7573747261746f7220416e7920466f726d617420577269' +
-                 ' 746572' +
-                 ' ]' +
-                 ' }' +
-                 ' /parameter-11 {' +
-                 ' /key 1702392942' +
-                 ' /showInPalette -1' +
-                 ' /type (ustring)' +
-                 ' /value [ 6' +
-                 ' 61692c616974' +
-                 ' ]' +
-                 ' }' +
-                 ' }' +
-                 '}';
-  }
+  function _copy(file, folder) {
+    if (arguments.length != 2) throw new Error('Invalid number of arguments');
+    if (!file.exists) throw new Error("Moving file doesn't exists");
+    if (!folder.getFiles) throw new Error("Folder doesn't passed");
 
-  runAction(actStr, 'Action Name', 'Set Name');
+    if (!folder.exists) folder.create();
+    if (!folder.exists) throw new Error("Folder doesn't exists");
 
-  open(new File(str));
-  d.close(SaveOptions.DONOTSAVECHANGES);
+    var fileCopy, fileBinStr, files;
 
-  function runAction(aiActionString, aiActionName, aiActionSetName) {
-    var f = new File('~/ScriptAction.aia');
-    f.open('w');
-    f.write(aiActionString);
-    f.close();
-    app.loadAction(f);
-    f.remove();
+    fileCopy = new File(folder.fullName + '/' + file.name);
 
-    app.doScript(aiActionName, aiActionSetName, false); // action name, set name
-    app.unloadAction(aiActionSetName, ''); // set name
-  }
+    file.encoding = 'BINARY';
+    fileCopy.encoding = 'BINARY';
 
-  function encodeStrToAnsii(str) {
-    var result = '';
-    for (var i = 0; i < str.length; i++) {
-      var chr = File.encode(str[i]);
-      chr = chr.replace(/%/gmi, '');
-      if (chr.length == 1) {
-        result += chr.charCodeAt(0).toString(16);
-      } else {
-        result += chr.toLowerCase();
-      }
+    file.open('r');
+    fileBinStr = file.read();
+    file.close();
+
+    fileCopy.open('e');
+    fileCopy.write(fileBinStr);
+    fileCopy.close();
+
+    files = folder.getFiles('*.ai');
+
+    for (var i = 0; i < files.length; i++) {
+      if (fileCopy.fullName != files[i].fullName) continue;
+      return 'All good!';
     }
-    return result;
+    throw new Error("Unknown Error");
   }
 
-  function formatDate(date) {
+  function _move(file, folder) {
+    if (arguments.length != 2) throw new Error('Invalid number of arguments');
+    if (!file.exists) throw new Error("Moving file doesn't exists");
+    if (!folder.getFiles) throw new Error("Folder doesn't passed");
+
+    if (!folder.exists) folder.create();
+    if (!folder.exists) throw new Error("Folder doesn't exists");
+
+    var fileCopy, fileBinStr, files;
+
+    fileCopy = new File(folder.fullName + '/' + file.name);
+
+    file.encoding = 'BINARY';
+    fileCopy.encoding = 'BINARY';
+
+    file.open('r');
+    fileBinStr = file.read();
+    file.close();
+
+    fileCopy.open('e');
+    fileCopy.write(fileBinStr);
+    fileCopy.close();
+
+    files = folder.getFiles('*.ai');
+
+    for (var i = 0; i < files.length; i++) {
+      if (fileCopy.fullName != files[i].fullName) continue;
+      file.remove();
+      return 'All good!';
+    }
+    throw new Error("Unknown Error");
+  }
+
+  function _replaceDate(file, dateStr) {
+    var reDate = /^.*_\d{1,2}[-._]\d{1,2}[-._]\d{2,4}.*\.ai$/;
+    var reArtb = /^.*-\d{2}\.ai$/;
+    var reAi = /^.*\.ai/;
+    var str = file.name;
+    var newFileName;
+
+    if (str.match(reDate)) {
+      newFileName = str.replace(/_\d{1,2}[-._]\d{1,2}[-._]\d{2,4}/, '_' + dateStr);
+    } else if (str.match(reArtb)) {
+      newFileName = str.replace(/(^.*)(-\d{2}\.ai$)/, '$1' + '_' + dateStr + '$2');
+    } else if (str.match(reAi)) {
+      newFileName = str.replace(/(^.*)(\.ai$)/, '$1' + '_' + dateStr + '$2');
+    } else {throw new Error('Rename error');}
+    return newFileName;
+
+  }
+
+  function _formatDate(date) {
     var d = date || new Date();
     // форматировать дату, с учетом того, что месяцы начинаются с 0
     d = [
