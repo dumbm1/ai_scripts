@@ -12,6 +12,7 @@
 
     var aD          = activeDocument,
         adFullName  = aD.fullName,
+        adPath      = aD.path,
         folderName  = 'rm',
         file        = new File(adFullName),
         folder      = new Folder(file.path + '/rm'),
@@ -22,11 +23,11 @@
     aD.close(SaveOptions.DONOTSAVECHANGES);
 
     copyStatus = _copy(file, folder);
-    renameStatus = file.rename(_replaceDate(file, now));
+    renameStatus = file.rename(fileNewName);
 
     status = 'copy status: ' + copyStatus + '\n' + 'rename status: ' + renameStatus;
 
-    open(new File(_replaceDate(file, now)));
+    open(new File(adPath + '/' + fileNewName));
 
   } catch (e) {
     status = e;
