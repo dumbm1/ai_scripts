@@ -1,121 +1,47 @@
-//@target illustrator-22
 ;(function saveAsNow() {
-  /**
-   * close active document
-   * move file to the new folder via read/write
-   **/
 
   try {
-    var status = '??? Unknown status ???';
+    var d             = activeDocument,
+        dFullName     = d.fullName,
+        dPath         = d.path,
+        dName         = d.name,
+        file          = new File(dFullName),
+        copyFolder    = new Folder(dPath + '/rm'),
+        now           = _formatDate(new Date()),
+        fileNameNow   = _replaceDate(dName, now),
+        fileNow = new File(dPath + '/rm/' + fileNameNow),
+        copyBatString = 'copy ' + dFullName.fsName + ' ' + dPath.fsName + '\\rm\\' + dName;
 
-    if (documents.length == 0) throw new Error('No open documents!');
+    d.close(SaveOptions.DONOTSAVECHANGES);
+    if (!copyFolder.exists) copyFolder.create();
 
-    var aD          = activeDocument,
-        adFullName  = aD.fullName,
-        adPath      = aD.path,
-        folderName  = 'rm',
-        file        = new File(adFullName),
-        folder      = new Folder(file.path + '/rm'),
-        now         = _formatDate(new Date()),
-        fileNewName = _replaceDate(file, now),
-        copyStatus, renameStatus;
+    _execFile('~/copy.bat', copyBatString);
+    $.sleep(500);
 
-    aD.close(SaveOptions.DONOTSAVECHANGES);
+    if(!fileNow.exists) $.sleep(1000);
 
-    copyStatus = _copy(file, folder);
-    renameStatus = file.rename(fileNewName);
+    file.rename(fileNameNow);
 
-    status = 'copy status: ' + copyStatus + '\n' + 'rename status: ' + renameStatus;
-
-    open(new File(adPath + '/' + fileNewName));
+    open(new File(dPath + '/' + fileNameNow));
 
   } catch (e) {
-    status = e;
-  } finally {
-    alert(status);
-    return status;
+    alert(e);
   }
 
-  function _copy(file, folder) {
-    if (arguments.length != 2) throw new Error('Invalid number of arguments');
-    if (!file.exists) throw new Error("Moving file doesn't exists");
-    if (!folder.getFiles) throw new Error("Folder doesn't passed");
-
-    if (!folder.exists) folder.create();
-    if (!folder.exists) throw new Error("Folder doesn't exists");
-
-    var fileCopy, fileBinStr, files;
-
-    fileCopy = new File(folder.fullName + '/' + file.name);
-
-    file.encoding = 'BINARY';
-    fileCopy.encoding = 'BINARY';
-
-    file.open('r');
-    fileBinStr = file.read();
-    file.close();
-
-    fileCopy.open('e');
-    fileCopy.write(fileBinStr);
-    fileCopy.close();
-
-    files = folder.getFiles('*.ai');
-
-    for (var i = 0; i < files.length; i++) {
-      if (fileCopy.fullName != files[i].fullName) continue;
-      return 'All good!';
-    }
-    throw new Error("Unknown Error");
-  }
-
-  function _move(file, folder) {
-    if (arguments.length != 2) throw new Error('Invalid number of arguments');
-    if (!file.exists) throw new Error("Moving file doesn't exists");
-    if (!folder.getFiles) throw new Error("Folder doesn't passed");
-
-    if (!folder.exists) folder.create();
-    if (!folder.exists) throw new Error("Folder doesn't exists");
-
-    var fileCopy, fileBinStr, files;
-
-    fileCopy = new File(folder.fullName + '/' + file.name);
-
-    file.encoding = 'BINARY';
-    fileCopy.encoding = 'BINARY';
-
-    file.open('r');
-    fileBinStr = file.read();
-    file.close();
-
-    fileCopy.open('e');
-    fileCopy.write(fileBinStr);
-    fileCopy.close();
-
-    files = folder.getFiles('*.ai');
-
-    for (var i = 0; i < files.length; i++) {
-      if (fileCopy.fullName != files[i].fullName) continue;
-      file.remove();
-      return 'All good!';
-    }
-    throw new Error("Unknown Error");
-  }
-
-  function _replaceDate(file, dateStr) {
+  function _replaceDate(str, dateStr) {
     var reDate = /^.*_\d{1,2}[-._]\d{1,2}[-._]\d{2,4}.*\.ai$/;
     var reArtb = /^.*-\d{2}\.ai$/;
     var reAi = /^.*\.ai/;
-    var str = file.name;
-    var newFileName;
+    var resultStr;
 
     if (str.match(reDate)) {
-      newFileName = str.replace(/_\d{1,2}[-._]\d{1,2}[-._]\d{2,4}/, '_' + dateStr);
+      resultStr = str.replace(/_\d{1,2}[-._]\d{1,2}[-._]\d{2,4}/, '_' + dateStr);
     } else if (str.match(reArtb)) {
-      newFileName = str.replace(/(^.*)(-\d{2}\.ai$)/, '$1' + '_' + dateStr + '$2');
+      resultStr = str.replace(/(^.*)(-\d{2}\.ai$)/, '$1' + '_' + dateStr + '$2');
     } else if (str.match(reAi)) {
-      newFileName = str.replace(/(^.*)(\.ai$)/, '$1' + '_' + dateStr + '$2');
+      resultStr = str.replace(/(^.*)(\.ai$)/, '$1' + '_' + dateStr + '$2');
     } else {throw new Error('Rename error');}
-    return newFileName;
+    return resultStr;
 
   }
 
@@ -131,5 +57,24 @@
       d[i] = d[i].slice(-2);
     }
     return d.slice(0, 3).join('-') + d.slice(3).join(':');
+  }
+
+  /**
+   * make new file by full path, write to disk with some file contenr, execute file
+   *
+   * @param {String} filePath - FULL path (include file-extension)
+   * @param {String} fileContent - content to new file
+   */
+  function _execFile(filePath, fileContent) {
+    if (new File(filePath).exists) {
+      new File(filePath).remove();
+    }
+
+    var f = new File(filePath);
+
+    f.open('e');
+    f.write(fileContent);
+    f.close();
+    f.execute();
   }
 }());
