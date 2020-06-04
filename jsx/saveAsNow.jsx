@@ -9,16 +9,18 @@
         copyFolder    = new Folder(dPath + '/rm'),
         now           = _formatDate(new Date()),
         fileNameNow   = _replaceDate(dName, now),
-        fileNow = new File(dPath + '/rm/' + fileNameNow),
+        fileNow       = new File(dPath + '/rm/' + fileNameNow),
         copyBatString = 'copy ' + dFullName.fsName + ' ' + dPath.fsName + '\\rm\\' + dName;
 
     d.close(SaveOptions.DONOTSAVECHANGES);
     if (!copyFolder.exists) copyFolder.create();
 
     _execFile('~/copy.bat', copyBatString);
-    $.sleep(500);
 
-    if(!fileNow.exists) $.sleep(1000);
+    for (var i = 0; i < 10; i++) {
+      if (fileNow.exists) break;
+      $.sleep(100);
+    }
 
     file.rename(fileNameNow);
 
