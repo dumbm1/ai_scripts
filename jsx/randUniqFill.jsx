@@ -68,7 +68,7 @@
       c            = rndInt(0, 100);
       m            = rndInt(0, 100);
       y            = rndInt(0, 100);
-      k            = rndInt(0, 100);
+      k            = 0 /*rndInt(0, 100)*/;
       resCMYK      = '' + c + ',' + m + ',' + y + ',' + k;
       obj[resCMYK] = resCMYK;
     }
