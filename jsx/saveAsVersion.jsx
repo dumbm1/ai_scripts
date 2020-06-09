@@ -1,0 +1,157 @@
+/**
+ * saveAsCC
+ *
+ * */
+
+;(function saveAsVersion() {
+  var vers = prompt('Verions (CC, CS6, CS5, CS4):', 'CC') || 'CC';
+  var fileFullName = activeDocument.path + '/' + activeDocument.name.slice(-3) + '_CC.ai';
+  _saveAsVersion(fileFullName, vers, 'saveAsCC', 'saveAsCC');
+
+  function _saveAsVersion(fileFullName, downVersion, setName, actionName) {
+
+    var fileFullName = __encodeStr2Ansii(fileFullName);
+    var downVersion = __getDownVersions(downVersion);
+    var actStr = __makeActStr(fileFullName, downVersion);
+
+    /**
+     *** LIB ***
+     */
+
+    function __makeActStr(fileFullName, downVersion) {
+      return "/version 3" +
+             "/name [ 8" +
+             "	7361766541734343" +
+             "]" +
+             "/isOpen 1" +
+             "/actionCount 1" +
+             "/action-1 {" +
+             "	/name [ 8" +
+             "		7361766541734343" +
+             "	]" +
+             "	/keyIndex 0" +
+             "	/colorIndex 0" +
+             "	/isOpen 1" +
+             "	/eventCount 1" +
+             "	/event-1 {" +
+             "		/useRulersIn1stQuadrant 0" +
+             "		/internalName (adobe_saveDocumentAs)" +
+             "		/localizedName [ 7" +
+             "			53617665204173" +
+             "		]" +
+             "		/isOpen 1" +
+             "		/isOn 1" +
+             "		/hasDialog 1" +
+             "		/showDialog 0" +
+             "		/parameterCount 11" +
+             "		/parameter-1 {" +
+             "			/key 1668116594" +
+             "			/showInPalette -1" +
+             "			/type (boolean)" +
+             "			/value 1" +
+             "		}" +
+             "		/parameter-2 {" +
+             "			/key 1885627936" +
+             "			/showInPalette -1" +
+             "			/type (boolean)" +
+             "			/value 0" +
+             "		}" +
+             "		/parameter-3 {" +
+             "			/key 1668445298" +
+             "			/showInPalette -1" +
+             "			/type (integer)" +
+             "			/value " + downVersion +
+             "		}" +
+             "		/parameter-4 {" +
+             "			/key 1702392878" +
+             "			/showInPalette -1" +
+             "			/type (integer)" +
+             "			/value 1" +
+             "		}" +
+             "		/parameter-5 {" +
+             "			/key 1768842092" +
+             "			/showInPalette -1" +
+             "			/type (integer)" +
+             "			/value 0" +
+             "		}" +
+             "		/parameter-6 {" +
+             "			/key 1918989423" +
+             "			/showInPalette -1" +
+             "			/type (real)" +
+             "			/value 100.0" +
+             "		}" +
+             "		/parameter-7 {" +
+             "			/key 1886545516" +
+             "			/showInPalette -1" +
+             "			/type (integer)" +
+             "			/value 0" +
+             "		}" +
+             "		/parameter-8 {" +
+             "			/key 1936548194" +
+             "			/showInPalette -1" +
+             "			/type (boolean)" +
+             "			/value 0" +
+             "		}" +
+             "		/parameter-9 {" +
+             "			/key 1851878757" +
+             "			/showInPalette -1" +
+             "			/type (ustring)" +
+             "			/value [ 85" + fileFullName +
+             "			]" +
+             "		}" +
+             "		/parameter-10 {" +
+             "			/key 1718775156" +
+             "			/showInPalette -1" +
+             "			/type (ustring)" +
+             "			/value [ 35" +
+             "				41646f626520496c6c7573747261746f7220416e7920466f726d617420577269" +
+             "				746572" +
+             "			]" +
+             "		}" +
+             "		/parameter-11 {" +
+             "			/key 1702392942" +
+             "			/showInPalette -1" +
+             "			/type (ustring)" +
+             "			/value [ 6" +
+             "				61692c616974" +
+             "			]" +
+             "		}" +
+             "	}" +
+             "}";
+    }
+
+    function __encodeStr2Ansii(s) {
+      var res = '';
+      var cod = '';
+      for (var i = 0; i < s.length; i++) {
+        cod = s.slice(i, i + 2);
+        if (cod == '00') continue;
+        res += cod.charCodeAt(0);
+      }
+      return res;
+    }
+
+    function __runAction(actionName, setName, actionString) {
+      var file = new File('~/JavaScriptAction.aia');
+      file.open('w');
+      file.write(actionString);
+      file.close();
+      loadAction(file);
+      doScript(actionName, setName);
+      unloadAction(setName, '');
+      file.remove();
+    }
+
+    function __getDownVersions(downVersion) {
+      var versions = {
+        "2020": "18",
+        "CC"  : "17",
+        "CS6" : "16",
+        "CS5" : "15",
+        "CS4" : "14",
+      }
+      return versions[downVersion];
+    }
+
+  }
+}());
