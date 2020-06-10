@@ -17,14 +17,3 @@ function convAnsiiToString(s) {
   }
   return res;
 }
-
-function strToAcsii(s) {
-  var res = '';
-  var cod = '';
-  for (var i = 0; i < s.length; i++) {
-    cod = s.slice(i, i + 2);
-    if (cod == '00') continue;
-    res += cod.charCodeAt(0);
-  }
-  return res;
-}
