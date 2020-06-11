@@ -17,10 +17,22 @@
  * todo: add extension panel vue-js interface
  * */
 
-;(function saveAsLegacy(opts) {
+try {
+  saveAsLegacy();
+} catch (e) {
+  alert(e);
+}
+
+function saveAsLegacy(opts) {
+
+  if (!documents.length) throw new Error('No open documents');
+  if (!new File(activeDocument.fullName).exists) throw new Error('File does not exists');
 
   var opts = opts || {};
-  var legacyVersion = opts.legacyVersion || prompt("Type version: CC, CS6, CS5, CS4 (empty Errors!)", 'CC') || 'CC';
+  var legacyVersion = opts.legacyVersion || prompt("Type version: CC, CS6, CS5, CS4 (empty Errors!)", 'CC');
+
+  if (!legacyVersion) throw new Error('User is abort process');
+
   var setName = opts.actionSetName || '__saveAsLegacy__';
   var actionName = opts.actionName || '__saveAsLegacy__';
 
@@ -184,4 +196,4 @@
     file.remove();
   }
 
-}());
+}
