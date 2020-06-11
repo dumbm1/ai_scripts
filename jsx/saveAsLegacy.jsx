@@ -29,7 +29,16 @@ function saveAsLegacy(opts) {
   if (!new File(activeDocument.fullName).exists) throw new Error('File does not exists');
 
   var opts = opts || {};
-  var legacyVersion = opts.legacyVersion || prompt("Type version: CC, CS6, CS5, CS4 (empty Errors!)", 'CC');
+  var legacyVersionNumbers = {
+    '2020': '18',
+    'CC'  : '17',
+    'CS6' : '16',
+    'CS5' : '15',
+    'CS4' : '14',
+  }
+  var legacyVersion = opts.legacyVersion || (prompt("Type version: 2020, CC, CS6, CS5, CS4", 'CC')).toUpperCase();
+
+  if (!legacyVersionNumbers[legacyVersion]) throw new Error('Incorrect version');
 
   if (!legacyVersion) throw new Error('User is abort process');
 
@@ -99,7 +108,7 @@ function saveAsLegacy(opts) {
            "			/key 1668445298" +
            "			/showInPalette -1" +
            "			/type (integer)" +
-           "			/value " + __getLegacyVersionNumber(legacyVersion) +
+           "			/value " + legacyVersionNumbers[legacyVersion] +
            "		}" +
            "		/parameter-4 {" +
            "			/key 1702392878" +
@@ -173,16 +182,12 @@ function saveAsLegacy(opts) {
       }
       return result;
     }
-    function __getLegacyVersionNumber(str) {
-      var legacyVersionNumbers = {
-        '2020': '18',
-        'CC'  : '17',
-        'CS6' : '16',
-        'CS5' : '15',
-        'CS4' : '14',
-      }
-      return legacyVersionNumbers[str];
-    }
+
+  }
+
+  function _getLegacyVersionNumber(str) {
+
+    return legacyVersionNumbers[str];
   }
 
   function _runAction(actionName, setName, actionString) {
