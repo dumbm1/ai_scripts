@@ -1,15 +1,43 @@
-;(function saveAsLegacy(opts) {
-  var opts = opts || {};
-  var legacyVersion = opts.legacyVersion || 'CC';
-  var setName = opts.actionSetName || 'saveAsLegacy';
-  var actionName = opts.actionName || 'saveAsLegacy';
-  var isCreatePdfCompatible,
-      isIncludeLinkedFiles,
-      isEmbedICCProfiles,
-      isUseCompression,
-      isSaveEachArtboardToASeparateFile;
+/**
+ * saveAsLegasy
+ * Illustrator CC+ (CS6???)
+ *
+ * use the loadAction
+ * downgrade the version of an Illustrator file to CC-CS4
+ * saveAs the document to the same folder
+ * add to the file name suffix of version
+ *
+ * in this version used compression parameter
+ * other parameters are switched off
+ *
+ * todo: error handling
+ * todo: check parameters value with the error handling
+ * todo: add parameter isSaveEachArtboardToASeparateFile
+ * todo: split action string to the blocks
+ * todo: add extension panel vue-js interface
+ * */
 
-  alert([legacyVersion, setName, actionName])
+;(function saveAsLegacy(opts) {
+
+  var opts = opts || {};
+  var legacyVersion = opts.legacyVersion || prompt("Type version: CC, CS6, CS5, CS4 (empty Errors!)", 'CC') || 'CC';
+  var setName = opts.actionSetName || '__saveAsLegacy__';
+  var actionName = opts.actionName || '__saveAsLegacy__';
+
+  var isCreatePdfCompatible = opts.isCreatePdfCompatible || '0', // parameter-2
+      isIncludeLinkedFiles  = opts.isIncludeLinkedFiles || '0', // parameter-5
+      isEmbedICCProfiles    = opts.isEmbedICCProfiles || '0', // parameter-7
+      isUseCompression      = opts.isUseCompression || '1'; // parameter-1
+
+  /*** parameter-8 ***
+   * if === 1, then structure of the action is changes:
+   * "parameterCount" becomes equal to "13"
+   * parameters 9, 10, 11 shifted and became 11, 12, 13
+   * new parameters 9, 10:
+   * parameter-9 - all artboards (boolean)
+   * parameter-10 - range of artboards (userstring)
+   * */
+  var isSaveEachArtboardToASeparateFile;
 
   _runAction(actionName, setName, _getSeveAsLegasyActString());
 
@@ -47,19 +75,19 @@
            "			/key 1668116594" +
            "			/showInPalette -1" +
            "			/type (boolean)" +
-           "			/value 1" +
+           "			/value " + isUseCompression +
            "		}" +
            "		/parameter-2 {" +
            "			/key 1885627936" +
            "			/showInPalette -1" +
            "			/type (boolean)" +
-           "			/value 0" +
+           "			/value " + isCreatePdfCompatible +
            "		}" +
            "		/parameter-3 {" +
            "			/key 1668445298" +
            "			/showInPalette -1" +
            "			/type (integer)" +
-           "			/value 17" +
+           "			/value " + __getLegacyVersionNumber(legacyVersion) +
            "		}" +
            "		/parameter-4 {" +
            "			/key 1702392878" +
@@ -96,8 +124,8 @@
            "			/showInPalette -1" +
            "			/type (ustring)" +
            "			/value [ " +
-           __encodeStr2Ansii((new File((activeDocument.path + '/' + activeDocument.name + '').slice(0, -3) + "_CC.ai")).fsName + '').length / 2 + " " +
-           __encodeStr2Ansii((new File((activeDocument.path + '/' + activeDocument.name + '').slice(0, -3) + "_CC.ai")).fsName + '') +
+           __encodeStr2Ansii((new File((activeDocument.path + '/' + activeDocument.name + '').slice(0, -3) + "_" + legacyVersion + ".ai")).fsName + '').length / 2 + " " +
+           __encodeStr2Ansii((new File((activeDocument.path + '/' + activeDocument.name + '').slice(0, -3) + "_" + legacyVersion + ".ai")).fsName + '') +
            "			]" +
            "		}" +
            "		/parameter-10 {" +
@@ -133,6 +161,16 @@
       }
       return result;
     }
+    function __getLegacyVersionNumber(str) {
+      var legacyVersionNumbers = {
+        '2020': '18',
+        'CC'  : '17',
+        'CS6' : '16',
+        'CS5' : '15',
+        'CS4' : '14',
+      }
+      return legacyVersionNumbers[str];
+    }
   }
 
   function _runAction(actionName, setName, actionString) {
@@ -144,17 +182,6 @@
     doScript(actionName, setName);
     unloadAction(setName, '');
     file.remove();
-  }
-
-  function _getLegacyVersionNumber(str) {
-    var legacyVersionNumbers = {
-      '2020': '18',
-      'CC'  : '17',
-      'CS6' : '16',
-      'CS5' : '15',
-      'CS4' : '14',
-    }
-    return legacyVersionNumbers[str];
   }
 
 }());
