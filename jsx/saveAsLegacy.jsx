@@ -1,4 +1,11 @@
 /**
+ * todo: error handling
+ * todo: check parameters value with the error handling
+ * todo: add parameter isSaveEachArtboardToASeparateFile
+ * todo: split action string to the blocks
+ * todo: add extension panel vue-js interface*/
+
+/**
  * saveAsLegasy
  * Illustrator CC+ (CS6???)
  *
@@ -10,18 +17,9 @@
  * in this version used compression parameter
  * other parameters are switched off
  *
- * todo: error handling
- * todo: check parameters value with the error handling
- * todo: add parameter isSaveEachArtboardToASeparateFile
- * todo: split action string to the blocks
- * todo: add extension panel vue-js interface
  * */
 
-try {
-  saveAsLegacy();
-} catch (e) {
-  alert(e);
-}
+try { saveAsLegacy();} catch (e) { alert(e);}
 
 function saveAsLegacy(opts) {
 
@@ -36,11 +34,13 @@ function saveAsLegacy(opts) {
     'CS5' : '15',
     'CS4' : '14',
   }
-  var legacyVersion = opts.legacyVersion || (prompt("Type version: 2020, CC, CS6, CS5, CS4", 'CC')).toUpperCase();
-
-  if (!legacyVersionNumbers[legacyVersion]) throw new Error('Incorrect version');
+  var legacyVersion = opts.legacyVersion || (prompt("Type version: 2020, CC, CS6, CS5, CS4", 'CC'));
 
   if (!legacyVersion) throw new Error('User is abort process');
+
+  legacyVersion = legacyVersion.toUpperCase();
+
+  if (!legacyVersionNumbers[legacyVersion]) throw new Error('Incorrect version');
 
   var setName = opts.actionSetName || '__saveAsLegacy__';
   var actionName = opts.actionName || '__saveAsLegacy__';
