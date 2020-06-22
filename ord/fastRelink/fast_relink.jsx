@@ -14,7 +14,6 @@
  *
  * todo: optimization:
  * todo: (1) add/remove action only once on start/end of the script execution
- * todo: (2) remove sub-entity "Embedded"
  *
  **/
 
@@ -55,23 +54,13 @@ function fast_relink() {
 
     executeMenuCommand('deselectall');
 
-    _relinkAllPlaced(placed, newLinkFile);
     _relinkAllRasters(rasters, newLinkFile);
+    _relinkAllPlaced(placed, newLinkFile);
 
   } catch (e) {
     alert(e);
   }
 
-  function _getRasters() {
-    var rastersArr = [];
-    var rasters = activeDocument.rasterItems;
-    for (var i = 0; i < rasters.length; i++) {
-      if (rasters[i].selected == true) {
-        rastersArr.push(rasters[i]);
-      }
-    }
-    return rastersArr;
-  }
   function _getPlaced() {
     var placedArr = [];
     var placed = activeDocument.placedItems;
@@ -83,7 +72,26 @@ function fast_relink() {
     }
     return placedArr;
   }
+  function _getRasters() {
+    var rastersArr = [];
+    var rasters = activeDocument.rasterItems;
+    for (var i = 0; i < rasters.length; i++) {
+      if (rasters[i].selected == true) {
+        rastersArr.push(rasters[i]);
+      }
+    }
+    return rastersArr;
+  }
 
+  function _relinkAllPlaced(placed, newLinkFile) {
+    for (var i = 0; i < placed.length; i++) {
+      __relinkOnePlaced(placed[i], newLinkFile);
+    }
+
+    function __relinkOnePlaced(placed, newLinkFile) {
+      placed.file = newLinkFile;
+    }
+  }
   function _relinkAllRasters(rasters, newLinkFile) {
     for (var i = rasters.length - 1; i >= 0; i--) {
       rasters[i].selected = true;
@@ -93,15 +101,6 @@ function fast_relink() {
 
     function __relinkOneRaster(newLinkFile) {
       __relinkByAction(newLinkFile);
-    }
-  }
-  function _relinkAllPlaced(placed, newLinkFile) {
-    for (var i = 0; i < placed.length; i++) {
-      __relinkOnePlaced(placed[i], newLinkFile);
-    }
-
-    function __relinkOnePlaced(placed, newLinkFile) {
-      placed.file = newLinkFile;
     }
   }
 
