@@ -54,11 +54,13 @@ function fast_relink() {
 
     executeMenuCommand('deselectall');
 
-    _relinkAllRasters(rasters, newLinkFile);
     _relinkAllPlaced(placed, newLinkFile);
+    _relinkAllRasters(rasters, newLinkFile);
 
   } catch (e) {
     alert(e);
+  } finally {
+
   }
 
   function _getPlaced() {
@@ -87,6 +89,8 @@ function fast_relink() {
     for (var i = 0; i < placed.length; i++) {
       __relinkOnePlaced(placed[i], newLinkFile);
     }
+
+    executeMenuCommand('deselectall');
 
     function __relinkOnePlaced(placed, newLinkFile) {
       placed.file = newLinkFile;
@@ -247,6 +251,23 @@ function fast_relink() {
       doScript(actionName, setName);
       unloadAction(setName, '');
       file.remove();
+    }
+
+    function Action(actionName, setName, actionString) {
+      this.file = new File('~/JavaScriptAction.aia');
+      this.loadAction = function () {
+        this.file.open('w');
+        this.file.write(actionString);
+        this.file.close();
+        loadAction(this.file);
+      }
+      this.runAction = function () {
+        doScript(actionName, setName);
+      }
+      this.rmAction = function () {
+        unloadAction(setName, '');
+        this.file.remove();
+      }
     }
 
   }
