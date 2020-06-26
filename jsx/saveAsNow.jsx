@@ -6,11 +6,12 @@
         dPath         = d.path,
         dName         = d.name,
         file          = new File(dFullName),
-        copyFolder    = new Folder(dPath + '/rm'),
+        fold2MoveName = prompt('input "rm" or leave "old"', 'old'),
+        copyFolder    = new Folder(dPath + '/' + fold2MoveName),
         now           = _formatDate(new Date()),
         fileNameNow   = _replaceDate(dName, now),
         fileNow       = new File(dPath + '/rm/' + fileNameNow),
-        copyBatString = 'copy ' + dFullName.fsName + ' ' + dPath.fsName + '\\rm\\' + dName;
+        copyBatString = 'copy ' + dFullName.fsName + ' ' + dPath.fsName + '\\' + fold2MoveName + '\\' + dName;
 
     d.close(SaveOptions.DONOTSAVECHANGES);
     if (!copyFolder.exists) copyFolder.create();
