@@ -55,7 +55,7 @@ function fast_relink() {
   } catch (e) {
     alert(e);
   } finally {
-    try {act.rmAction();} catch (e) {alert('filnally section: \n' + e);}
+    try {if (rasters.length) {act.rmAction();}} catch (e) {/*alert('filnally section: \n' + e);*/}
   }
 
   function _getPlaced() {
