@@ -6,8 +6,11 @@
         dPath         = d.path,
         dName         = d.name,
         file          = new File(dFullName),
-        fold2MoveName = prompt('input "rm" or leave "old"', 'old'),
-        copyFolder    = new Folder(dPath + '/' + fold2MoveName),
+        fold2MoveName = prompt('input "rm" or leave "old"', 'old');
+
+    if (!fold2MoveName) throw new Error('User cancel operation');
+
+    var copyFolder    = new Folder(dPath + '/' + fold2MoveName),
         now           = _formatDate(new Date()),
         fileNameNow   = _replaceDate(dName, now),
         fileNow       = new File(dPath + '/rm/' + fileNameNow),
