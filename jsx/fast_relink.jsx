@@ -1,161 +1,63 @@
 /**
- * ai.jsx ©MaratShagiev m_js@bk.ru 16.10.2014
+ * fastRelink_v1.2.0 (19.10.2020) JavaScript for Illustrator CC+
  *
- * fastRelink_v1.0
+ * relink all links in current document selection to one that you select in dialog
  *
- * перелинковывает много одиноковых линков на один указанный
+ * use:
+ * 1. select raster/placed/embedded items... or all items in document
+ * 2. run script
+ * 3. in dialog window select new link file >> OK
  *
- * использование:
- * выделить объекты
- * запустите скрипт
- * в открывшемся окне выберите нужный файл и нажмите ОК
- * все выделенные линки перелинкуются на выбранный
+ * result: all selected items relink to new link file
  *
- * особенности:
- * при замене внедрённых растровых объектов угол поворота не учитывается
+ * Contact me: Marat Shagiev, m_js@bk.ru
+ *
+ * todo: refactoring - make constructors with methods
+ *
  **/
 
-fastRelink();
+fast_relink();
 
-function fastRelink() {
+function fast_relink() {
 
   try {
-    if (selection.length == 0) {
-      throw new Error('Выделите линки и/или растровые изображения');
-      return;
-    }
-    else if (_getPlaced().length == 0 && _getRasters().length == 0 && _getEmbedded().length == 0) {
-      throw new Error('В выделенном фрагменте нет линков и растровых изображений');
-      return;
-    }
 
-    var doc = activeDocument;
-    var path; // начальная папка, открывающаяся в диалоге File(path).openDlg()
+    if (!documents.length) throw new Error('No document');
+    if (!selection[0]) throw new Error('No selected items!'); // no selection
 
-    if (!(File(doc.fullName).exists)) {
-      path = Folder.desktop;
-    } else {
-      path = doc.fullName;
-    }
+    var placed  = _getPlaced(),
+        rasters = _getRasters();
 
-    var newLinkFile = File(path).openDlg(); // откроется папка хранения текущего файла
+    if (!placed.length && !rasters.length) throw new Error('No raster/placed items in selection');
 
-    if (!newLinkFile) {
-      throw new Error('Файл для релинка не выбран');
-      return;
-    }
+    var doc  = activeDocument,
+        path = doc.fullName;
 
-    var embedded = _getEmbedded();
-    var placed = _getPlaced();
-    var rasters = _getRasters();
+    if (!(File(doc.fullName).exists)) path = Folder.desktop;
+
+    var newLinkFile = File(path).openDlg();
+
+    if (!newLinkFile) throw new Error('No new file to link');
+
+    var actName           = 'fast_relink_' + ((+new Date()) * Math.random() * 1e7 + new Array(6).join('0')).slice(0, 6),
+        newLinkFileFsPath = newLinkFile.fsName + '',
+        actionString      = _getFastRelinkActString(newLinkFileFsPath, actName);
+
+    var act = new Action(actName, actName, actionString);
+
+    if (rasters.length) act.loadAction();
+
+    executeMenuCommand('deselectall');
 
     _relinkAllPlaced(placed, newLinkFile);
-    _relinkAllRasters(rasters, newLinkFile);
-    _relinkAllEmbedded(embedded, newLinkFile);
+    _relinkAllRasters(rasters, newLinkFile, act);
 
   } catch (e) {
-    alert(e.line + ' ' + e.message);
+    alert(e);
+  } finally {
+    try {if (rasters.length) {act.rmAction();}} catch (e) {/*alert('filnally section: \n' + e);*/}
   }
 
-  /**
-   * перелинк всех  залинкованных файлов
-   * @param {Array} placed - массив объектов класса PlacedItem
-   * @param {Object} linkFile - файл для релинка
-   */
-  function _relinkAllPlaced(placed, linkFile) {
-    for (var i = 0; i < placed.length; i++) {
-      _relinkOnePlaced(placed[i], linkFile);
-    }
-  }
-  /**
-   * замена объекта класса RasterItem на объект класса PlacedItem
-   * @param {Array} placed - линк
-   * @param {Object} linkFile - файл для релинка
-   */
-  function _relinkAllRasters(rasters, linkFile) {
-    for (var i = 0; i < rasters.length; i++) {
-      _relinkOneRaster(rasters[i], linkFile);
-    }
-  }
-  /**
-   * замена объекта класса RasterItem на объект класса PlacedItem
-   * @param {Array} embedded - массив объектов RasterItem, у которых сохранилась ссылка на файл
-   * @param {Object} linkFile - файл для релинка
-   */
-  function _relinkAllEmbedded(embedded, linkFile) {
-    for (var i = 0; i < embedded.length; i++) {
-      _relinkOneEmbedded(embedded[i], linkFile);
-    }
-  }
-
-  function _relinkOneEmbedded(embedded, linkFile) {
-    var linkItem = embedded.layer.placedItems.add();  
-    linkItem.file = linkFile;
-    linkItem.height = embedded.height;
-    linkItem.width = embedded.width;
-    linkItem.position = embedded.position;
-    _moveAfter(linkItem, embedded);
-    embedded.remove();
-    return linkItem;
-  }
-
-  function _relinkOneRaster(raster, linkFile) {
-    var linkItem = raster.layer.placedItems.add(); 
-    linkItem.file = linkFile;
-    linkItem.height = raster.height;
-    linkItem.width = raster.width;
-    linkItem.position = raster.position;
-    _moveAfter(linkItem, raster);
-    raster.remove();
-    return linkItem;
-  }
-
-  function _relinkOnePlaced(placed, linkFile) {
-    placed.file = linkFile;
-    return placed;
-  }
-
-  /**
-   * взять выделенные rasterItems имеющие file
-   * @return {Array} embddedArr - массив rasterItem
-   */
-  function _getEmbedded() {
-    var embeddedArr = [];
-    var rasters = activeDocument.rasterItems;
-    for (var i = 0; i < rasters.length; i++) {
-      if (rasters[i].selected == true) {
-        try {
-          rasters[i].file ? embeddedArr.push(rasters[i]) : '';
-        } catch (e) {
-        }
-      }
-    }
-    return embeddedArr;
-  }
-
-  /**
-   * взять выделенные объекты класса rasterItem без file
-   * @return {Array} rastersArr - массив из выделнных объектов класса rasterItem
-   */
-  function _getRasters() {
-    var rastersArr = [];
-    var rasters = activeDocument.rasterItems;
-    for (var i = 0; i < rasters.length; i++) {
-      if (rasters[i].selected == true) {
-        try {
-          rasters[i].file ? '' : ''
-        } catch (e) {
-          rastersArr.push(rasters[i]);
-        }
-      }
-    }
-    return rastersArr;
-  }
-
-  /**
-   * взять выделенные объекты класса placedItem
-   * @return {Array} placedArr - массив из выделнных объектов класса placedItem
-   */
   function _getPlaced() {
     var placedArr = [];
     var placed = activeDocument.placedItems;
@@ -168,17 +70,237 @@ function fastRelink() {
     return placedArr;
   }
 
-  /**
-   * перемещает item непосредственно после target
-   * @param {Object} item
-   * @param {Object} target
-   * */
-  function _moveAfter(item, target) {
-    try {
-      if (target && item) {
-        item.move(target, ElementPlacement.PLACEAFTER);
+  function _getRasters() {
+    var rastersArr = [];
+    var rasters = activeDocument.rasterItems;
+    for (var i = 0; i < rasters.length; i++) {
+      if (rasters[i].selected == true) {
+        rastersArr.push(rasters[i]);
       }
-    } catch (e) {
+    }
+    return rastersArr;
+  }
+
+  function _relinkAllPlaced(placed, newLinkFile) {
+    for (var i = 0; i < placed.length; i++) {
+      __relinkOnePlaced(placed[i], newLinkFile);
+    }
+
+    executeMenuCommand('deselectall');
+
+    function __relinkOnePlaced(placed, newLinkFile) {
+      placed.file = newLinkFile;
+    }
+  }
+
+  function _relinkAllRasters(rasters, newLinkFile, act) {
+    for (var i = rasters.length - 1; i >= 0; i--) {
+      rasters[i].selected = true;
+      __relinkOneRaster();
+      executeMenuCommand('deselectall');
+    }
+
+    function __relinkOneRaster() {
+      act.runAction();
+    }
+  }
+
+  function __relinkByAction(newLinkFile) {
+
+  }
+
+  function Action(actionName, setName, actionString) {
+    this.file = new File('~/JavaScriptAction.aia');
+    this.loadAction = function () {
+      this.file.open('w');
+      this.file.write(actionString);
+      this.file.close();
+      loadAction(this.file);
+    };
+    this.runAction = function () {
+      doScript(actionName, setName);
+    };
+    this.rmAction = function () {
+      unloadAction(setName, '');
+      this.file.remove();
+    };
+  }
+
+  function Relinker(doc, newLinkFile) {
+
+    this.getPlaced = function (filterStringVal, boolValue) {
+      var placedArr = [];
+      var placed = doc.placedItems;
+
+      if (arguments.length === 2) {
+        for (var i = 0; i < placed.length; i++) {
+          if (placed[i][filterStringVal] === boolValue) {
+            placedArr.push(placed[i]);
+          }
+        }
+      } else {
+        for (var i = 0; i < placed.length; i++) placedArr.push(placed[i]);
+      }
+
+      return placedArr;
+    };
+    this.getRasters = function (filterStringVal, boolValue) {
+      var rastersArr = [];
+      var rasters = doc.rasterItems;
+
+      if (arguments.length === 2) {
+        for (var i = 0; i < rasters.length; i++) {
+          if (rasters[i][filterStringVal] === boolValue) {
+            rastersArr.push(rasters[i]);
+          }
+        }
+      } else {
+        for (var i = 0; i < rasters.length; i++) rastersArr.push(rasters[i]);
+      }
+
+      return rastersArr;
+    };
+    this.relinkPlaced = function (placed){
+      for (var i = 0; i < placed.length; i++) {
+        var placedElement = placed[i];
+        placedElement.file = newLinkFile;
+      }
+      executeMenuCommand('deselectall');
+    };
+    this.relinkRasters = function (rasters, relinkFunction ){
+      for (var i = rasters.length - 1; i >= 0; i--) {
+        rasters[i].selected = true;
+        relinkFunction();
+        executeMenuCommand('deselectall');
+      }
+    };
+  }
+
+  function _getFastRelinkActString(newLinkFileFsPath, actName) {
+    var actName = __encodeStr2Ansii(actName);
+    var newLinkFileFsPathEncoded = __encodeStr2Ansii(newLinkFileFsPath);
+    var actRelinkString = "/version 3" +
+      "/name [ " +
+      actName.length / 2 + " " +
+      actName +
+      "]" +
+      "/isOpen 0" + // in action rater2ai == 0
+      "/actionCount 1" +
+      "/action-1 {" +
+      "	/name [ " +
+      actName.length / 2 + " " +
+      actName +
+      "	]" +
+      "	/keyIndex 0" +
+      "	/colorIndex 0" +
+      "	/isOpen 1" +
+      "	/eventCount 1" +
+      "	/event-1 {" +
+      "		/useRulersIn1stQuadrant 0" +
+      "		/internalName (adobe_placeDocument)" +
+      "		/localizedName [ 5" +
+      "			506c616365" +
+      "		]" +
+      "		/isOpen 0" + // in action rater2ai == 0
+      "		/isOn 1" +
+      "		/hasDialog 1" +
+      "		/showDialog 0" +
+      "		/parameterCount 12" +
+      "		/parameter-1 {" +
+      "			/key 1885431653" +
+      "			/showInPalette -1" +
+      "			/type (integer)" +
+      "			/value 1" +
+      "		}" +
+      "		/parameter-2 {" +
+      "			/key 1668444016" +
+      "			/showInPalette -1" +
+      "			/type (enumerated)" +
+      "			/name [ 7" +
+      "				43726f7020546f" +
+      "			]" +
+      "			/value 1" +
+      "		}" +
+      "		/parameter-3 {" +
+      "			/key 1885823860" +
+      "			/showInPalette -1" +
+      "			/type (integer)" +
+      "			/value 1" +
+      "		}" +
+      "		/parameter-4 {" +
+      "			/key 1851878757" +
+      "			/showInPalette -1" +
+      "			/type (ustring)" +
+      "			/value [ " +
+      newLinkFileFsPathEncoded.length / 2 + " " +
+      newLinkFileFsPathEncoded +
+      "			]" +
+      "		}" +
+      "		/parameter-5 {" +
+      "			/key 1818848875" +
+      "			/showInPalette -1" +
+      "			/type (boolean)" +
+      "			/value 1" +
+      "		}" +
+      "		/parameter-6 {" +
+      "			/key 1919970403" +
+      "			/showInPalette -1" +
+      "			/type (boolean)" +
+      "			/value 1" +
+      "		}" +
+      "		/parameter-7 {" +
+      "			/key 1953329260" +
+      "			/showInPalette -1" +
+      "			/type (boolean)" +
+      "			/value 0" +
+      "		}" +
+      "		/parameter-8 {" +
+      "			/key 1768779887" +
+      "			/showInPalette -1" +
+      "			/type (boolean)" +
+      "			/value 0" +
+      "		}" +
+      "		/parameter-9 {" +
+      "			/key 1885828462" +
+      "			/showInPalette -1" +
+      "			/type (boolean)" +
+      "			/value 0" +
+      "		}" +
+      "		/parameter-10 {" +
+      "			/key 1935895653" +
+      "			/showInPalette -1" +
+      "			/type (real)" +
+      "			/value 1.0" +
+      "		}" +
+      "		/parameter-11 {" +
+      "			/key 1953656440" +
+      "			/showInPalette -1" +
+      "			/type (real)" +
+      "			/value 0.0" +
+      "		}" +
+      "		/parameter-12 {" +
+      "			/key 1953656441" +
+      "			/showInPalette -1" +
+      "			/type (real)" +
+      "			/value 0.0" +
+      "		}" +
+      "	}" +
+      "}";
+
+    return actRelinkString;
+
+    function __encodeStr2Ansii(str) {
+      var result = '';
+      for (var i = 0; i < str.length; i++) {
+        var chr = File.encode(str[i]);
+        chr = chr.replace(/%/gmi, '');
+        if (chr.length == 1) {
+          result += chr.charCodeAt(0).toString(16);
+        } else {
+          result += chr.toLowerCase();
+        }
+      }
+      return result;
     }
   }
 }
