@@ -1,6 +1,6 @@
 //todo: (1) get Selection (2) add two rect (3) add text frame
 
-// function AddTechFrame_onlyTT() {
+( function AddTechFrame_onlyTT() {
 var MM_TO_PT     = 2.834645668,
     doc          = activeDocument,
     sel          = selection[0],
@@ -10,7 +10,9 @@ var MM_TO_PT     = 2.834645668,
     rect, rect2, frame,
     fillCol, strokeCol,
     fact,
-    textContents = prompt('Set text: ', 'ТОЛЬКО «ТЕХНИЧЕСКИЙ» ТЕКСТ (УВЕЛИЧЕНИЕ 200%)');
+    textContents = prompt('Set text: ', 'БЛАНК ДЛЯ ПРОВЕРКИ КОРРЕКТНОСТИ / ГРАМОТНОСТИ «ТЕХНИЧЕСКОГО» ТЕКСТА РАСПОЛОЖЕНИЕ ТЕКСТОВЫХ БЛОКОВ ПРОИЗВОЛЬНОЕ');
+
+if(!textContents) return;
 
 gr.move(lay, ElementPlacement.PLACEATEND);
 
@@ -52,4 +54,4 @@ frame.position = [
 fact = (rect2.width - extendValue) * 100 / frame.width;
 frame.resize(fact, fact, true, true, true, true, 0.00, Transformation.CENTER);
 
-// }
+ }());
