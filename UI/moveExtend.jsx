@@ -4,7 +4,7 @@
  * e-mail: m_js@bk.ru
  * 04.12.2016
  *
- * duplicateItems_v1.0
+ * moveExtend_v1.1
  * */
 //@target illustrator
 
