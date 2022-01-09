@@ -1,5 +1,5 @@
 /**
- * fastRelink_v1.2.0 (19.10.2020) JavaScript for Illustrator CC+
+ * fastRelink_v1.2.1 (10.11.2021) JavaScript for Illustrator CC+
  *
  * relink all links in current document selection to one that you select in dialog
  *
@@ -12,7 +12,12 @@
  *
  * Contact me: Marat Shagiev, m_js@bk.ru
  *
- * todo: refactoring - make constructors with methods
+ * Versions History
+ * ===
+ * 1.2.1
+ * --
+ * try to fix bug in MacOS: incorrect work of the file-filter
+ * (replace file.openDlg() function to File.saveDialog() function)
  *
  **/
 
@@ -35,7 +40,8 @@ function fast_relink() {
 
     if (!(File(doc.fullName).exists)) path = Folder.desktop;
 
-    var newLinkFile = File(path).openDlg();
+    // var newLinkFile = File(path).openDlg();
+    var newLinkFile = File.saveDialog();
 
     if (!newLinkFile) throw new Error('No new file to link');
 
