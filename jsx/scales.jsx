@@ -1,5 +1,5 @@
 /**
- * 27.12.2021
+ * 13.12.2022
  * make scales for GammaFlex
  */
 
@@ -9,6 +9,7 @@ var dColors = dPantNames.concat(dCMYK);
 
 make_scales({
               colorNames: dColors,
+              figure: "rectangle",
             });
 
 function make_scales(opts) {
@@ -17,8 +18,8 @@ function make_scales(opts) {
       doc      = activeDocument;
 
   var opts       = opts || {},
-      colorSteps = opts.colorSteps || [100, 70, 50, 30, 4],
-      figure     = opts.figure || 'rectangle',
+      colorSteps = opts.colorSteps || [100, 70, 50, 30, 3],
+      figure     = opts.figure || 'ellipse',
       RADIUS     = opts.radius * MM_TO_PT || 5 * MM_TO_PT,
       colorNames = opts.colorNames || ['cyan', 'magenta', 'yellow', 'black'],
       shiftTop   = opts.shiftTop * MM_TO_PT || 0,
