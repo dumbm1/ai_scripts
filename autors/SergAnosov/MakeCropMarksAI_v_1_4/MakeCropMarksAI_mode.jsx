@@ -374,7 +374,7 @@
             ) {
 
               exit_if_bad_input = true;
-              alert("Bad number input!");
+              alert("Bad input-number input!");
               et.text   = def;
               et.active = true;
               return et.text;

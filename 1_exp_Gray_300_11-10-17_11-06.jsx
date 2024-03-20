@@ -34,7 +34,7 @@
     "000000" +
     "01" + // compression methods
     "000000" +
-    "03" + // number of scans, when progressive compression: from 03 to 05
+    "03" + // input-number of scans, when progressive compression: from 03 to 05
     "000000" +
     "01" + // anti-aliasing
     "0000000000" +

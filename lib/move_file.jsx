@@ -1,5 +1,5 @@
 function _copy(file, folder) {
-  if (arguments.length != 2) throw new Error('Invalid number of arguments');
+  if (arguments.length != 2) throw new Error('Invalid input-number of arguments');
   if (!file.exists) throw new Error("Moving file doesn't exists");
   if (!folder.getFiles) throw new Error("Folder doesn't passed");
 
@@ -31,7 +31,7 @@ function _copy(file, folder) {
 }
 
 function _move(file, folder) {
-  if (arguments.length != 2) throw new Error('Invalid number of arguments');
+  if (arguments.length != 2) throw new Error('Invalid input-number of arguments');
   if (!file.exists) throw new Error("Moving file doesn't exists");
   if (!folder.getFiles) throw new Error("Folder doesn't passed");
 

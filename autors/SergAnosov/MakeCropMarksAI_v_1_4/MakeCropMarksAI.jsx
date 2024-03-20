@@ -540,7 +540,7 @@ function main ()
 					{
 						// считаем, что ошибка ввода
 						exit_if_bad_input = true;
-						alert( "Bad number input!" );
+						alert( "Bad input-number input!" );
 						et.text = def;// присваиваем текст по умолчанию
 						et.active = true;
 						return et.text;

@@ -45,7 +45,7 @@ function ai_exp_jpg() {
     "000000" +
     compressionMethod + // compression methods
     "000000" +
-    scans + // number of scans, when progressive compression: from 03 to 05
+    scans + // input-number of scans, when progressive compression: from 03 to 05
     "000000" +
     antiAliasing + // anti-aliasing
     "0000000000" +

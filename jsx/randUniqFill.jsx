@@ -122,7 +122,7 @@
   }
 
   /**
-   * random INTEGER number from min to max
+   * random INTEGER input-number from min to max
    *
    * @param {Number} min
    * @param {Number} max

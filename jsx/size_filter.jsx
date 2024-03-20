@@ -47,8 +47,8 @@ function size_filter(opts) {
  * repeat function 'f' 'count' times
  *
  * @param {Function} f - function to benchmarking
- * @param {Number} count - number of repeats
- * @param {Array} any number of any parameters, that passed to a function 'f'
+ * @param {Number} count - input-number of repeats
+ * @param {Array} any input-number of any parameters, that passed to a function 'f'
  * @return {Array} [average execution time, total bench time]
  * */
 function bench(f, count) {

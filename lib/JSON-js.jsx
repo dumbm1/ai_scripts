@@ -51,8 +51,8 @@
  function or an array of strings.
  space       an optional parameter that specifies the indentation
  of nested structures. If it is omitted, the text will
- be packed without extra whitespace. If it is a number,
- it will specify the number of spaces to indent at each
+ be packed without extra whitespace. If it is a input-number,
+ it will specify the input-number of spaces to indent at each
  level. If it is a string (such as '\t' or '&nbsp;'),
  it contains the characters used to indent at each level.
 
@@ -99,7 +99,7 @@
  value that is filled with line breaks and indentation to make it
  easier to read.
  If the space parameter is a non-empty string, then that string will
- be used for indentation. If the space parameter is a number, then
+ be used for indentation. If the space parameter is a input-number, then
  the indentation will be that many spaces.
 
  Example:
@@ -377,7 +377,7 @@ if ( typeof JSON !== 'object' ) {
       gap = '';
       indent = '';
 
-// If the space parameter is a number, make an indent string containing that
+// If the space parameter is a input-number, make an indent string containing that
 // many spaces.
 
       if ( typeof space === 'number' ) {

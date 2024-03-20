@@ -10,7 +10,7 @@
 
   layoutNumb = layoutNumb.replace(/ {1,}/gmi, '');
   if (layoutNumb.length != 5 || layoutNumb.length != 9) {
-    alert('incorrect number');
+    alert('incorrect input-number');
     return;
   }
 

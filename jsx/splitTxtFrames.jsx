@@ -57,7 +57,7 @@
       if (protectCount % (protectLim + protectStart) == 0) {
         if (confirm
           ('It seems that the loop becomes infinite\n' +
-            'Current number of iterations is ' + (protectCount - (protectCount % protectLim)) + '\n' +
+            'Current input-number of iterations is ' + (protectCount - (protectCount % protectLim)) + '\n' +
             'Do you want to abort the script?')) break;
       }
       protectCount++;

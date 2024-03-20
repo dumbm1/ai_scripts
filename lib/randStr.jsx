@@ -17,7 +17,7 @@ function randStr(numb) {
 
   var str = ((+new Date()) * Math.random() *
     1e7 + // shift (delete) decimal point
-    new Array(n).join('0') // for the case when random number is 0
+    new Array(n).join('0') // for the case when random input-number is 0
   ).slice(0, n);
 
   return str;

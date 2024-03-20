@@ -7,7 +7,7 @@
  ###algorithm:
  1. select (if turns), compare and get max bounds, push to array
  2. copy
- 3. create new document with the correct number and size artbords
+ 3. create new document with the correct input-number and size artbords
  4. paste
  5. distribute symbols to artboards
  6. fit all artboards to arts

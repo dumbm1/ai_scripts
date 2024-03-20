@@ -21,7 +21,7 @@
 //     The script asks you to continue if there's a difference greater than 1 pt
 //     between width and height of foreground path.
 //  2. Run this script.  The foreground path is removed after rounding.
-//  #. When the number of selected path is 1, predefined radius is used
+//  #. When the input-number of selected path is 1, predefined radius is used
 //     for rounding. (-- see "setting" section below)
 
 // ## Rounding Method
@@ -100,12 +100,12 @@ function roundAnyCorner(){
   // When use half width of foreground path as rounding radius
   if(use_foreground_shape_to_set_radius){
     if(s.length < 2){
-      // case : the number of selected path is 1
+      // case : the input-number of selected path is 1
       // ver10 -- round by predefined value
       // CS -- ask radius by prompt window
       if(! ver10) use_foreground_shape_to_set_radius = false;
     } else {
-      // case : the number of selected path > 1
+      // case : the input-number of selected path > 1
       var pi = s.shift();      // remove foreground path from list of selection
       var rr2 = getRadius(pi, check_circle); // get half width of it
       
@@ -141,7 +141,7 @@ function roundAnyCorner(){
     }
     
     if(isNaN(eval_rr) || eval_rr <= 0){
-      alert("\nERROR: fail to convert the expression to a positive number.");
+      alert("\nERROR: fail to convert the expression to a positive input-number.");
       return;
     }
 
@@ -514,7 +514,7 @@ function getPathItemsInSelection(n, pathes){
 // extract PathItems from "s" (Array of PageItems -- ex. selection),
 // and put them into an Array "pathes".  If "pp_length_limit" is specified,
 // this function extracts PathItems which PathPoints length is greater
-// than this number.
+// than this input-number.
 function extractPathes(s, pp_length_limit, pathes){
   for(var i = 0; i < s.length; i++){
     if(s[i].typename == "PathItem"){
@@ -574,7 +574,7 @@ function readjustAnchors(p){
 // return pathpoint's index. when the argument is out of bounds,
 // fixes it if the path is closed (ex. next of last index is 0),
 // or return -1 if the path is not closed.
-function parseIdx(p, n){ // PathPoints, number for index
+function parseIdx(p, n){ // PathPoints, input-number for index
   var len = p.length;
   if(p.parent.closed){
     return n >= 0 ? n % len : len - Math.abs(n % len);

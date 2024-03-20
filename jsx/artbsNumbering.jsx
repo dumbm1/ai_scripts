@@ -64,7 +64,7 @@ function UI_insertPageNumbers () {
 
     win.helpTip       = "Coded by CarlosCanto";
     btnPage.helpTip   = "Adds *page* keyword, it represents a single page";
-    btnPages.helpTip  = "Adds *pages* keyword, it represents total number of pages";
+    btnPages.helpTip  = "Adds *pages* keyword, it represents total input-number of pages";
     txtFooter.helpTip = "Type \r\t'Page *page* of *pages*' \rto get \r\t'Page 1 of 3' \rfor example";
 
     //-----------------------------------------------------------------------------------------
@@ -100,8 +100,8 @@ function UI_insertPageNumbers () {
       var ilayer  = idoc.layers.add ();
       ilayer.name = "Page Numbers";
 
-      var pages       = idoc.artboards.length; // number of artboards
-      var footerPages = (txtFooter.text).replace ("*pages*", pages); // replace the "*pages*" keyword with the actual number fo pages (artboards)
+      var pages       = idoc.artboards.length; // input-number of artboards
+      var footerPages = (txtFooter.text).replace ("*pages*", pages); // replace the "*pages*" keyword with the actual input-number fo pages (artboards)
 
       var margins = Number (txtMargins.text) * 72; // get margins in points
       //$.writeln(margins);
