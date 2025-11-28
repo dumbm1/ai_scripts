@@ -3,28 +3,15 @@
  * remove layers by names
  * that may correct in prompt window
  * */
-;(function rmTechLays(TECH_LAYS) {
-  var lays = activeDocument.layers;
-  var techLays = TECH_LAYS ||
-                 prompt(
-                   'Technical Layers list: ', 'LAYOUT, COMMON, @_TT, COLORS, KLAPAN, W'
-                 ).replace(
-                   /^ +/, ''
-                 ).replace(
-                   / +$/, ''
-                 ).split(
-                   /( ?)*,( ?)*/
-                 );
-
-  for (var i = lays.length - 1; i >= 0; i--) {
-
-    for (var j = 0; j < techLays.length; j++) {
-
-      if (lays[i].name.toUpperCase() != techLays[j]) continue;
-      lays[i].visible = true;
-      lays[i].remove();
-      break;
-
-    }
-  }
-}(/*['LAYOUT', 'W', 'COMMON', '@_TT', 'COLORS, KLAPAN']*/));
+;(function rmTechLays() {
+ if (!confirm('Удалить все слои, кроме слоя "out"?')) return;
+ var ad = activeDocument;
+ var lays = ad.layers;
+ for (var i = lays.length - 1; i >= 0; i--) {
+  var lay = lays[i];
+  if (lay.visible == false) lay.visible = true;
+  if (lay.locked = true) lay.locked = false;
+  if (lay.name == 'out') continue;
+  lay.remove();
+ }
+}());
