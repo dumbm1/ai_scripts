@@ -1,6 +1,5 @@
 renameLayersForAe();
 
-
 function renameLayersForAe() {
  var ad = activeDocument;
  var lays = ad.layers;
@@ -14,9 +13,11 @@ function renameLayersForAe() {
  function _getName(name) {
   switch (name) {
    case 'out':
+   case 'out_color':
     return 'out color';
     break;
    case 'w':
+   case 'out_w':
     return 'out w';
     break;
    case 'inf-tab':
