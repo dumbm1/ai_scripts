@@ -40,8 +40,8 @@ function fast_relink() {
 
     if (!(File(doc.fullName).exists)) path = Folder.desktop;
 
-    // var newLinkFile = File(path).openDlg();
-    var newLinkFile = File.saveDialog();
+    var newLinkFile = File(path).openDlg();
+    // var newLinkFile = File.saveDialog();
 
     if (!newLinkFile) throw new Error('No new file to link');
 
