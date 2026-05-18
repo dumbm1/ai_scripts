@@ -15,7 +15,7 @@
  * удалеяет новые слои после закрытия окна 'Print'
  * todo: восстанавливает Layer.visible каждого слоя, как было
  * */
-//@target illustrator-26
+//@target illustrator
 main();
 
 function main() {
@@ -59,13 +59,16 @@ function main() {
 
   for (var i = 0; i < lays.length; i++) {
    var lay = lays[i];
-   if (lay.name != newLays[0].name &&
-    lay.name != newLays[1].name &&
-    lay.name != newLays[2].name) {
-    lay.visible = false;
-    continue;
+
+   for (var j = 0; j < newLays.length; j++) {
+    var newLay = newLays[j];
+    if (lay.name == newLay.name) {
+     lay.visible = true;
+     break;
+    }
    }
-   lay.visible = true;
+   if (j < newLays.length) continue;
+   lay.visible = false;
   }
  }
 
