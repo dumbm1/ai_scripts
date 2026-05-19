@@ -1,21 +1,28 @@
+//@target illustrator
+
 /**
- * helpForSep 0.0.1
+ * helpForSep 0.0.3
  * Скрипт подготовки к печати сепараций
- * Предварительно необходимо выделить мышкой слои для сепараций
- * Работает только с топ-слоями
- * Работает только с 1-м артбордом
- * todo: запоминает слои и Layer.visible каждого слоя
+ !!! Перед запуском выделить мышкой слои для сепараций !!!
+ (работает только с топ-слоями)
+ (работает только с первым артбордом)
+ *
+ Алгоритм:
+ ===
+ * запоминает слои и Layer.visible каждого слоя
  * копирует выделенные слои (Action)
  * находит и запоминает новые слои
  * снимает видимость со всех слоев, кроме новых
  * активирует первый артборд
  * группирует элементы в каждом новом слое
  * растрирует эти группы
- * вызывает окно принтовки ...
- * удалеяет новые слои после закрытия окна 'Print'
- * todo: восстанавливает Layer.visible каждого слоя, как было
+ * вызывает окно 'Print...'
+ * удалеяет новые слои после закрытия окна 'Print...'
+ * восстанавливает Layer.visible каждого слоя, как было
+ * todo: варианты разрешения для растрируемых слоев 72, 96, 150, 200, 250, 300
+ * todo: error handle
  * */
-//@target illustrator
+
 main();
 
 function main() {
@@ -23,9 +30,9 @@ function main() {
  var ad = activeDocument;
  ad.artboards.setActiveArtboardIndex(0);
  var lays = ad.layers;
+ var laysVisible = _getLaysVisible(lays);
  var originLaysNames = _getOriginLaysNames(lays);
  var newLays;
-
  var actStr_cpSelLays = _mkActStr_cpSelLays();
 
  _mkAct(actStr_cpSelLays);
@@ -38,6 +45,25 @@ function main() {
  executeMenuCommand('Print');
 
  _rmNewLays(newLays);
+ _setLaysVisible(lays, laysVisible);
+
+ /**
+  * LIB
+  * */
+
+ function _getLaysVisible(lays) {
+  var laysVisible = [];
+  for (var i = 0; i < lays.length; i++) {
+   laysVisible.push(lays[i].visible);
+  }
+  return laysVisible;
+ }
+
+ function _setLaysVisible(lays, laysVisible) {
+  for (var i = 0; i < lays.length; i++) {
+   lays[i].visible = laysVisible[i];
+  }
+ }
 
  function _rmNewLays(newLays) {
   for (var i = 0; i < newLays.length; i++) {
@@ -151,41 +177,5 @@ function main() {
    '		}' +
    '	}' +
    '}';
- }
-
- function test1() {
-  var ad = activeDocument;
-  var lays = ad.layers;
-  var laySepCol = lays.getByName('out color copy');
-  var laySepW = lays.getByName('out w copy 2');
-
-  ad.artboards.setActiveArtboardIndex(0);
-
-  for (var i = 0; i < lays.length; i++) {
-   var lay = lays[i];
-   if (lay.name != laySepCol.name && lay.name != laySepW.name) {
-    lay.visible = false;
-    continue;
-   }
-   lay.visible = true;
-  }
-
-  var laySep = lays.add();
-  laySep.name = 'laySep';
-
-  laySepCol.move(laySep, ElementPlacement.INSIDE);
-  laySepW.move(laySep, ElementPlacement.INSIDE);
-
-  laySepCol.hasSelectedArtwork = true;
-  executeMenuCommand('group');
-  ad.rasterize(selection[0]);
-
-  laySepW.hasSelectedArtwork = true;
-  executeMenuCommand('group');
-  ad.rasterize(selection[0]);
-
-  executeMenuCommand('Print');
-
-  laySep.remove();
  }
 }
