@@ -19,7 +19,6 @@
  * вызывает окно 'Print...'
  * удалеяет новые слои после закрытия окна 'Print...'
  * восстанавливает Layer.visible каждого слоя, как было
- * todo: варианты разрешения для растрируемых слоев 72, 96, 150, 200, 250, 300
  * todo: error handle
  * */
 
@@ -73,11 +72,14 @@ function main() {
  }
 
  function _rasterizeNewLays(newLays) {
+  var opts = new RasterizeOptions();
+  opts.resolution = +prompt('Введите разрешение от 72 до 2400', '200');
+
   for (var i = 0; i < newLays.length; i++) {
    var lay = newLays[i];
    lay.hasSelectedArtwork = true;
    executeMenuCommand('group');
-   ad.rasterize(selection[0]);
+   ad.rasterize(selection[0], undefined, opts);
   }
  }
 
